@@ -11,116 +11,140 @@ import (
 )
 
 var (
-	// Define flags for shorthand properties
-	dbTypeFlag     string
-	dbUsernameFlag string
-	dbPasswordFlag string
-	dbNameFlag     string
-	dbHostFlag     string
-	dbPortFlag     string
-	connStringFlag string
-	yesFlag        bool
+	appName              string
+	dbType               string
+	dbHost               string
+	dbName               string
+	dbUsername           string
+	dbPassword           string
+	dbPort               string
+	dbConnectionString   string
+	skipPrompts          bool
+	defaultAppName       = "my-gin-app"
+	defaultDBType        = "1" // MySQL as default
+	defaultDBHost        = "localhost"
+	defaultDBName        = "testdb"
+	defaultDBUsername    = "root"
+	defaultDBPassword    = "password"
+	defaultDBPort        = "3306"
+	defaultConnectionStr = "user:password@tcp(localhost:3306)/dbname"
 )
 
 var newCmd = &cobra.Command{
-	Use:   "new [app_name]",
+	Use:   "new",
 	Short: "Create a new Gin application with a project structure",
-	Args:  cobra.ExactArgs(1), // App name is mandatory
 	Run:   createNewApp,
 }
 
 func init() {
-	// Define flags for the command
-	newCmd.Flags().StringVarP(&dbTypeFlag, "db-type", "d", "", "Specify the database type (mysql, postgres, sqlite, mongodb)")
-	newCmd.Flags().StringVarP(&dbUsernameFlag, "db-username", "u", "", "Specify the database username")
-	newCmd.Flags().StringVarP(&dbPasswordFlag, "db-password", "p", "", "Specify the database password")
-	newCmd.Flags().StringVarP(&dbNameFlag, "db-name", "n", "", "Specify the database name")
-	newCmd.Flags().StringVarP(&dbHostFlag, "db-host", "h", "localhost", "Specify the database host (default: localhost)")
-	newCmd.Flags().StringVarP(&dbPortFlag, "db-port", "P", "", "Specify the database port (e.g., 3306 for MySQL)")
-	newCmd.Flags().StringVar(&connStringFlag, "conn-string", "", "Pass a database connection string instead of individual parameters")
-	newCmd.Flags().BoolVarP(&yesFlag, "yes", "y", false, "Use default values for all options")
 	rootCmd.AddCommand(newCmd)
+
+	// Add flags for user input
+	newCmd.Flags().StringVar(&appName, "app-name", "", "Name of your application")
+	newCmd.Flags().StringVar(&dbType, "db-type", "", "Database type (1: MySQL, 2: PostgreSQL, 3: SQLite, 4: MongoDB)")
+	newCmd.Flags().StringVar(&dbConnectionString, "db-connection-string", "", "Database connection string")
+	newCmd.Flags().StringVar(&dbHost, "db-host", "", "Database host")
+	newCmd.Flags().StringVar(&dbName, "db-name", "", "Database name")
+	newCmd.Flags().StringVar(&dbUsername, "db-username", "", "Database username")
+	newCmd.Flags().StringVar(&dbPassword, "db-password", "", "Database password")
+	newCmd.Flags().StringVar(&dbPort, "db-port", "", "Database port")
+	newCmd.Flags().BoolVarP(&skipPrompts, "yes", "y", false, "Skip all prompts and use default values")
 }
 
 func createNewApp(cmd *cobra.Command, args []string) {
-	appName := args[0] // Get the app name from the command arguments
+	if skipPrompts {
+		applyDefaultValues()
+	} else {
+		askForMissingValues()
+	}
 
-	// Gather inputs
-	dbType, dbConfig := gatherInputs()
-
-	// Create project directory and set up structure
 	projectDir := filepath.Join(".", appName)
 	createDirectoriesFromTemplate("templates/new/app", projectDir)
 
-	// Initialize Go module
 	utils.InitializeGoModule(projectDir, appName)
-
-	// Generate all project files from templates
-	generateProjectFiles(appName, dbType, dbConfig, projectDir)
+	generateProjectFiles(appName, dbType, getDBConfig(), projectDir)
 
 	fmt.Println("Application created successfully with full structure and Docker files!")
 }
 
-func gatherInputs() (string, map[string]string) {
-	if yesFlag {
-		// Use default values if the -y flag is provided
-		return "mysql", map[string]string{
-			"DBUsername": "root",
-			"DBPassword": "password",
-			"DBName":     "mydb",
-			"DBHost":     "localhost",
-			"DBPort":     "3306",
+// Use default values if --yes or -y flag is passed
+func applyDefaultValues() {
+	appName = defaultAppName
+	dbType = defaultDBType
+	dbHost = defaultDBHost
+	dbName = defaultDBName
+	dbUsername = defaultDBUsername
+	dbPassword = defaultDBPassword
+	dbPort = defaultDBPort
+	dbConnectionString = defaultConnectionStr
+}
+
+// Ask for missing values if no --yes flag is passed
+func askForMissingValues() {
+	if appName == "" {
+		fmt.Print("Enter your app name: ")
+		fmt.Scanln(&appName)
+	}
+	if dbType == "" {
+		fmt.Println("Select your database: 1. MySQL 2. PostgreSQL 3. SQLite 4. MongoDB")
+		fmt.Scanln(&dbType)
+	}
+	if dbConnectionString == "" {
+		if dbUsername == "" {
+			fmt.Print("Enter DB username: ")
+			fmt.Scanln(&dbUsername)
 		}
+		if dbPassword == "" {
+			fmt.Print("Enter DB password: ")
+			fmt.Scanln(&dbPassword)
+		}
+		if dbName == "" {
+			fmt.Print("Enter DB name: ")
+			fmt.Scanln(&dbName)
+		}
+		if dbHost == "" {
+			fmt.Print("Enter DB host (e.g., localhost): ")
+			fmt.Scanln(&dbHost)
+		}
+		if dbPort == "" {
+			fmt.Print("Enter DB port (e.g., 3306 for MySQL): ")
+			fmt.Scanln(&dbPort)
+		}
+	} else {
+		// If the user passes a connection string, parse the individual components
+		parseConnectionString(dbConnectionString)
 	}
-
-	// Check for connection string
-	if connStringFlag != "" {
-		dbType, dbConfig := parseConnectionString(connStringFlag)
-		return dbType, dbConfig
-	}
-
-	// Prompt for missing variables
-	if dbTypeFlag == "" {
-		fmt.Println("Select your database: 1. MySQL, 2. PostgreSQL, 3. SQLite, 4. MongoDB")
-		fmt.Scanln(&dbTypeFlag)
-	}
-
-	dbConfig := map[string]string{
-		"DBUsername": getOrPrompt(dbUsernameFlag, "Enter DB username"),
-		"DBPassword": getOrPrompt(dbPasswordFlag, "Enter DB password"),
-		"DBName":     getOrPrompt(dbNameFlag, "Enter DB name"),
-		"DBHost":     getOrPrompt(dbHostFlag, "Enter DB host (e.g., localhost)"),
-		"DBPort":     getOrPrompt(dbPortFlag, "Enter DB port (e.g., 3306 for MySQL)"),
-	}
-
-	return dbTypeFlag, dbConfig
 }
 
-// If the value is missing, ask the user for input
-func getOrPrompt(value, prompt string) string {
-	if value == "" {
-		fmt.Print(prompt + ": ")
-		fmt.Scanln(&value)
+// Function to parse the DB connection string and set the variables
+func parseConnectionString(connectionString string) {
+	// You can add logic to parse the connection string and split it into dbHost, dbUsername, dbPassword, etc.
+	parts := strings.Split(connectionString, "@")
+	if len(parts) == 2 {
+		dbCredentials := strings.Split(parts[0], ":")
+		if len(dbCredentials) == 2 {
+			dbUsername = dbCredentials[0]
+			dbPassword = dbCredentials[1]
+		}
+		dbHostAndPort := strings.Split(parts[1], "/")
+		hostPort := strings.Split(dbHostAndPort[0], ":")
+		if len(hostPort) == 2 {
+			dbHost = hostPort[0]
+			dbPort = hostPort[1]
+		}
+		dbName = dbHostAndPort[1]
 	}
-	return value
 }
 
-// Function to parse a database connection string
-func parseConnectionString(connStr string) (string, map[string]string) {
-	// Example: "user:password@tcp(localhost:3306)/dbname"
-	config := map[string]string{}
-	parts := strings.Split(connStr, "@")
-	credentials := strings.Split(parts[0], ":")
-	config["DBUsername"] = credentials[0]
-	config["DBPassword"] = credentials[1]
-
-	// Parse host and database
-	hostAndDB := strings.Split(parts[1], "/")
-	config["DBHost"] = strings.Split(hostAndDB[0], ":")[0]
-	config["DBPort"] = strings.Split(hostAndDB[0], ":")[1]
-	config["DBName"] = hostAndDB[1]
-
-	return "mysql", config // Assuming MySQL, modify to infer DB type if needed
+// Return the DB configuration
+func getDBConfig() map[string]string {
+	return map[string]string{
+		"DBUsername": dbUsername,
+		"DBPassword": dbPassword,
+		"DBName":     dbName,
+		"DBHost":     dbHost,
+		"DBPort":     dbPort,
+	}
 }
 
 func createDirectoriesFromTemplate(templateDir, projectDir string) {
@@ -143,11 +167,12 @@ func createDirectoriesFromTemplate(templateDir, projectDir string) {
 			return os.MkdirAll(targetPath, os.ModePerm)
 		}
 
-		// If it's a file, process it as a template without expecting a return value
+		// If it's a file, prepare it for template processing
 		if strings.HasSuffix(info.Name(), ".tpl") {
 			// Copy the template file to the corresponding path without the ".tpl" suffix
 			targetFile := strings.TrimSuffix(targetPath, ".tpl")
 			utils.GenerateFileFromTemplate(path, targetFile, nil)
+			return nil
 		}
 
 		return nil
