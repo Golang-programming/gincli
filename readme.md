@@ -16,7 +16,7 @@ This CLI tool helps you quickly set up [Gin Web Framework](https://gin-gonic.com
    git clone https://github.com/golang-programming/gincli.git
    cd gincli
    go build -o gin
-   mv cli /usr/local/bin/
+   mv gin /usr/local/bin/
    ```
 
 ## Usage
@@ -24,7 +24,7 @@ This CLI tool helps you quickly set up [Gin Web Framework](https://gin-gonic.com
 Generate a new Gin application by running:
 
 ```bash
-cli new [flags]
+gin new [flags]
 ```
 
 ### Available Flags
@@ -44,31 +44,31 @@ cli new [flags]
 1. **Create a New Application with Defaults**
 
    ```bash
-   cli new
+   gin new
    ```
 
 2. **Create a New Application with Custom Name**
 
    ```bash
-   cli new --app-name myapp
+   gin new --app-name myapp
    ```
 
 3. **Specify Database Type and Credentials**
 
    ```bash
-   cli new --db-type 2 --db-username user --db-password pass
+   gin new --db-type 2 --db-username user --db-password pass
    ```
 
 4. **Use a Custom Database Connection String**
 
    ```bash
-   cli new --db-connection-string "user:pass@tcp(localhost:3306)/dbname"
+   gin new --db-connection-string "user:pass@tcp(localhost:3306)/dbname"
    ```
 
 5. **Skip All Prompts**
 
    ```bash
-   cli new --yes
+   gin new --yes
    ```
 
 ## Running the Application
