@@ -91,4 +91,4 @@ gin new [flags]
 - The CLI automatically runs `go mod tidy` to manage dependencies.
 - Check that all environment variables are correctly set in the `.env` file.
 - If you encounter any issue, Feel free to open issue
-- For support mail me on (email)[zeshanshakil0@gmail.com]
+- For support mail me on [email](zeshanshakil0@gmail.com)
