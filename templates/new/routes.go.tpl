@@ -1,14 +1,14 @@
-package routes
+package main
 
 import (
     "github.com/gin-gonic/gin"
-    "{{.Module}}/controllers"
+    "{{.Module}}/app/controller"
 )
 
 func SetupRoutes(r *gin.RouterGroup) {
-    r.POST("/", controllers.Create)
-    r.GET("/", controllers.GetAll)
-    r.GET("/:id", controllers.GetById)
-    r.PUT("/", controllers.Update)
-    r.DELETE("/", controllers.Delete)
+    r.POST("/", controller.Create)
+    r.GET("/", controller.GetAll)
+    r.GET("/:id", controller.GetById)
+    r.PUT("/", controller.Update)
+    r.DELETE("/", controller.Delete)
 }
