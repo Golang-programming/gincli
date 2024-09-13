@@ -1,83 +1,128 @@
 package cmd
 
 import (
-    "fmt"
-    "os"
-    "os/exec"
-    "path/filepath"
+	"fmt"
+	"os"
+	"path/filepath"
 
-    "github.com/spf13/cobra"
-)
-
-var (
-    appName string
+	"github.com/golang-programming/gincli/utils"
+	"github.com/spf13/cobra"
 )
 
 var newCmd = &cobra.Command{
-    Use:   "new",
-    Short: "Create a new Gin application",
-    Run: func(cmd *cobra.Command, args []string) {
-        if len(args) < 1 {
-            fmt.Println("Please provide an application name.")
-            return
-        }
-        appName = args[0]
-        createNewApp(appName)
-    },
+	Use:   "new",
+	Short: "Create a new Gin application with a project structure",
+	Run: func(cmd *cobra.Command, args []string) {
+		createNewApp()
+	},
 }
 
 func init() {
-    rootCmd.AddCommand(newCmd)
+	rootCmd.AddCommand(newCmd)
 }
 
-func createNewApp(name string) {
-    fmt.Printf("Creating new Gin application: %s\n", name)
+func createNewApp() {
+	var appName, dbType, dbHost, dbName, dbUsername, dbPassword, dbPort string
 
-    // Create the application directory
-    if err := os.Mkdir(name, 0755); err != nil {
-        fmt.Println("Error creating directory:", err)
-        return
-    }
+	// Ask for app name
+	fmt.Print("Enter your app name: ")
+	fmt.Scanln(&appName)
 
-    // Change to the application directory
-    os.Chdir(name)
+	// Ask for database type
+	fmt.Println("Select your database:")
+	fmt.Println("1. MySQL")
+	fmt.Println("2. PostgreSQL")
+	fmt.Println("3. SQLite")
+	fmt.Println("4. MongoDB")
+	fmt.Print("Enter the number of the database type: ")
+	fmt.Scanln(&dbType)
 
-    // Initialize a new Go module
-    cmd := exec.Command("go", "mod", "init", name)
-    if output, err := cmd.CombinedOutput(); err != nil {
-        fmt.Println("Error initializing go module:", string(output))
-        return
-    }
+	// Collect DB Config
+	fmt.Print("Enter your DB username: ")
+	fmt.Scanln(&dbUsername)
+	fmt.Print("Enter your DB password: ")
+	fmt.Scanln(&dbPassword)
+	fmt.Print("Enter your DB name: ")
+	fmt.Scanln(&dbName)
+	fmt.Print("Enter your DB host (e.g., localhost): ")
+	fmt.Scanln(&dbHost)
+	fmt.Print("Enter your DB port (e.g., 3306 for MySQL): ")
+	fmt.Scanln(&dbPort)
 
-    // Get Gin package
-    cmd = exec.Command("go", "get", "github.com/gin-gonic/gin")
-    if output, err := cmd.CombinedOutput(); err != nil {
-        fmt.Println("Error getting Gin package:", string(output))
-        return
-    }
+	// Create project directory
+	projectDir := filepath.Join(".", appName)
+	err := os.MkdirAll(projectDir, os.ModePerm)
+	if err != nil {
+		fmt.Printf("Error creating project directory: %s\n", err)
+		return
+	}
 
-    // Create a main.go file
-    mainFilePath := filepath.Join("main.go")
-    mainFileContent := `package main
+	// Create necessary subdirectories
+	os.MkdirAll(filepath.Join(projectDir, "app", "pkg", "database"), os.ModePerm)
+	os.MkdirAll(filepath.Join(projectDir, "app", "controllers"), os.ModePerm)
+	os.MkdirAll(filepath.Join(projectDir, "app", "services"), os.ModePerm)
+	os.MkdirAll(filepath.Join(projectDir, "app", "utils"), os.ModePerm)
 
-import (
-    "github.com/gin-gonic/gin"
-)
+	// Initialize Go module
+	utils.InitializeGoModule(projectDir, appName)
 
-func main() {
-    r := gin.Default()
-    r.GET("/", func(c *gin.Context) {
-        c.JSON(200, gin.H{
-            "message": "Hello, world!",
-        })
-    })
-    r.Run() // listen and serve on 0.0.0.0:8080
+	// Generate all files from the structure
+	generateFullStructure(appName, dbType, dbUsername, dbPassword, dbName, dbHost, dbPort, projectDir)
 }
-`
-    if err := os.WriteFile(mainFilePath, []byte(mainFileContent), 0644); err != nil {
-        fmt.Println("Error creating main.go file:", err)
-        return
-    }
 
-    fmt.Println("Application created successfully!")
+func generateFullStructure(appName, dbType, dbUsername, dbPassword, dbName, dbHost, dbPort, projectDir string) {
+	// Determine DB driver
+	var dbDriver string
+	switch dbType {
+	case "1":
+		dbDriver = "mysql"
+	case "2":
+		dbDriver = "postgres"
+	case "3":
+		dbDriver = "sqlite"
+	default:
+		dbDriver = "mysql"
+	}
+
+	// Generate .env file
+	utils.GenerateFileFromTemplate(filepath.Join("templates", "new", ".env.tpl"), filepath.Join(projectDir, ".env"), map[string]string{
+		"DBUsername": dbUsername,
+		"DBPassword": dbPassword,
+		"DBName":     dbName,
+		"DBHost":     dbHost,
+		"DBPort":     dbPort,
+	})
+
+	// Generate main.go file
+	utils.GenerateFileFromTemplate(filepath.Join("templates", "new", "main.go.tpl"), filepath.Join(projectDir, "main.go"), map[string]string{
+		"Module": appName,
+	})
+
+	// Generate loadEnv.go file
+	utils.GenerateFileFromTemplate(filepath.Join("templates", "new", "loadEnv.go.tpl"), filepath.Join(projectDir, "loadEnv.go"), map[string]string{})
+
+	// Generate routes.go file
+	utils.GenerateFileFromTemplate(filepath.Join("templates", "new", "routes.go.tpl"), filepath.Join(projectDir, "routes.go"), map[string]string{
+		"Module": appName,
+	})
+
+	// Generate database.go file
+	utils.GenerateFileFromTemplate(filepath.Join("templates", "new", "app", "pkg", "database", "database.go.tpl"), filepath.Join(projectDir, "app", "pkg", "database", "database.go"), map[string]string{
+		"DBDriver": dbDriver,
+	})
+
+	// Generate controller.go file (Use `controller.go` instead of appending `appName`)
+	utils.GenerateFileFromTemplate(filepath.Join("templates", "new", "app", "controllers", "controller.go.tpl"), filepath.Join(projectDir, "app", "controllers", "controller.go"), map[string]string{
+		"Module": appName,
+	})
+
+	// Generate service.go file (Use `service.go` instead of appending `appName`)
+	utils.GenerateFileFromTemplate(filepath.Join("templates", "new", "app", "services", "service.go.tpl"), filepath.Join(projectDir, "app", "services", "service.go"), map[string]string{
+		"Module": appName,
+	})
+
+	// Generate sum-to-numbers.go file
+	utils.GenerateFileFromTemplate(filepath.Join("templates", "new", "app", "utils", "sum-to-numbers.go.tpl"), filepath.Join(projectDir, "app", "utils", "sum_to_numbers.go"), map[string]string{})
+
+	fmt.Println("Application created successfully with full structure!")
 }

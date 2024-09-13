@@ -1,18 +1,18 @@
 package cmd
 
 import (
-    "os"
+	"os"
 
-    "github.com/spf13/cobra"
+	"github.com/spf13/cobra"
 )
 
 var rootCmd = &cobra.Command{
     Use:   "gincli",
-    Short: "A CLI tool to generate Gin applications",
-    Long:  `gincli is a CLI tool to create and manage Gin web applications.`,
+    Short: "CLI to generate Gin web applications with different components.",
+    Long:  `A CLI tool for building scalable Gin applications, with the ability to generate controllers, services, models, middleware, routes, and more.`,
 }
 
-// Execute executes the root command.
+// Execute adds all child commands to the root command and sets flags appropriately.
 func Execute() {
     if err := rootCmd.Execute(); err != nil {
         os.Exit(1)
@@ -20,5 +20,7 @@ func Execute() {
 }
 
 func init() {
-    // Here you can define flags and configuration settings.
+    rootCmd.AddCommand(newCmd)
+    rootCmd.AddCommand(generateCmd)
+    // Removed: rootCmd.AddCommand(helpCmd)
 }
