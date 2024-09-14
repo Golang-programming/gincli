@@ -24,7 +24,7 @@ var (
 	dbPort             string
 	dbConnectionString string
 	skipPrompts        bool
-	template           string
+	templateChoice     string
 )
 
 const (
@@ -39,15 +39,14 @@ const (
 )
 
 var availableTemplates = map[string]string{
-	"1": "Standard",
-	"2": "Graphql",
+	"1": "standard",
+	"2": "graphql",
 }
 
 var dbTypes = map[string]string{
-	"1": "MySQL",
-	"2": "PostgreSQL",
-	"3": "SQLite",
-	"4": "MongoDB",
+	"1": "mysql",
+	"2": "pg",
+	"3": "sqlite",
 }
 
 var TemplateCmd = &cobra.Command{
@@ -57,7 +56,7 @@ var TemplateCmd = &cobra.Command{
 }
 
 func init() {
-	TemplateCmd.Flags().StringVar(&template, "template", "t", fmt.Sprintf("Template (Default: %s)", defaultTemplate))
+	TemplateCmd.Flags().StringVar(&templateChoice, "template", "", fmt.Sprintf("Template: 1. Standard, 2. Graphql (default: %s)", defaultTemplate))
 	TemplateCmd.Flags().StringVar(&appName, "app-name", "", fmt.Sprintf("Name of your application (default: %s)", defaultAppName))
 	TemplateCmd.Flags().StringVar(&dbTypeChoice, "db-type", "", "Database type: 1. MySQL, 2. PostgreSQL")
 	TemplateCmd.Flags().StringVar(&dbConnectionString, "db-connection-string", "", "Database connection string")
@@ -77,7 +76,7 @@ func loadTemplate(cmd *cobra.Command, args []string) {
 	}
 
 	projectDir := filepath.Join(".", appName)
-	createProjectFromTemplate(fmt.Sprintf("templates/new/%s", template), projectDir)
+	createProjectFromTemplate(fmt.Sprintf("templates/templates/%s", availableTemplates[templateChoice]), projectDir)
 
 	utils.InitializeGoModule(projectDir, appName)
 
@@ -109,8 +108,8 @@ func runGoModTidy(projectDir string) {
 }
 
 func setDefaultValues() {
-	if template == "" {
-		template = defaultTemplate
+	if templateChoice == "" {
+		templateChoice = "1"
 	}
 	if appName == "" {
 		appName = defaultAppName

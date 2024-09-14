@@ -31,7 +31,7 @@ func createProjectFromTemplate(templateDir, projectDir string) {
 
 		if strings.HasSuffix(info.Name(), ".tpl") {
 			targetFile := strings.TrimSuffix(targetPath, ".tpl")
-			utils.GenerateFileFromTemplate(path, targetFile, nil)
+			utils.GenerateFileFromTemplate(path, targetFile, getConfig())
 		}
 
 		return nil
@@ -40,4 +40,19 @@ func createProjectFromTemplate(templateDir, projectDir string) {
 	if err != nil {
 		fmt.Printf("Error while copying templates: %v\n", err)
 	}
+}
+
+func getConfig() map[string]string {
+	config := map[string]string{
+		"DBUsername": dbUsername,
+		"DBPassword": dbPassword,
+		"DBName":     dbName,
+		"DBHost":     dbHost,
+		"DBPort":     dbPort,
+		"Module":     appName,
+		"Template":   availableTemplates[templateChoice],
+		"DBDriver":   dbTypes[dbTypeChoice],
+	}
+
+	return config
 }

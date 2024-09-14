@@ -20,7 +20,7 @@ func promptForValues() {
 }
 
 func promptForTemplate() {
-	if template == "" {
+	if templateChoice == "" {
 		defaultTemplate := "1"
 		for {
 			fmt.Println("Select your template:")
@@ -29,13 +29,13 @@ func promptForTemplate() {
 			}
 
 			fmt.Printf("Enter choice [%s]: ", color.New(color.Faint).Sprint(defaultTemplate))
-			fmt.Scanln(&template)
+			fmt.Scanln(&templateChoice)
 
-			if template == "" {
-				template = defaultTemplate
+			if templateChoice == "" {
+				templateChoice = defaultTemplate
 			}
 
-			if _, exists := availableTemplates[template]; exists {
+			if _, exists := availableTemplates[templateChoice]; exists {
 				break
 			} else {
 				fmt.Println("Invalid choice, please select a valid option.")
