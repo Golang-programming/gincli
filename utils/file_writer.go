@@ -48,5 +48,5 @@ func GenerateFileFromTemplate(templatePath, outputPath string, data map[string]s
 		return
 	}
 
-	fmt.Printf("Generated file: %s\n", outputPath)
+	// fmt.Printf("Generated file: %s\n", outputPath)
 }

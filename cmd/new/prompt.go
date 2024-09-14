@@ -8,12 +8,9 @@ import (
 	"github.com/fatih/color"
 )
 
-var useGraphQL bool
-
 func promptForValues() {
 	promptForAppName()
 	promptForDBType()
-	promptForGraphQLSetup()
 	if dbConnectionString == "" {
 		promptForDBConfig()
 		dbConnectionString = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", dbUsername, dbPassword, dbHost, dbPort, dbName)
@@ -52,13 +49,6 @@ func promptForDBType() {
 			}
 		}
 	}
-}
-
-func promptForGraphQLSetup() {
-	var input string
-	fmt.Printf("Do you want to setup GraphQL? (y/n): ")
-	fmt.Scanln(&input)
-	useGraphQL = strings.ToLower(input) == "y"
 }
 
 func promptForDBConfig() {

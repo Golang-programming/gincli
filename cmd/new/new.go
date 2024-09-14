@@ -69,10 +69,9 @@ func createNewApp(cmd *cobra.Command, args []string) {
 	}
 
 	projectDir := filepath.Join(".", appName)
-	// createProjectFromTemplate("templates/new", projectDir)
-
 	utils.InitializeGoModule(projectDir, appName)
-	generateProjectFiles(appName, dbTypeChoice, getDBConfig(), projectDir)
+	setupProjectDirectories()
+	generateProjectFiles(projectDir)
 
 	// Run go mod tidy with spinner
 	runGoModTidy(projectDir)
@@ -99,27 +98,6 @@ func runGoModTidy(projectDir string) {
 
 	s.Stop()
 	fmt.Println(color.New(color.FgGreen).Sprint("`go mod tidy` completed successfully."))
-}
-
-func startApplication(projectDir string) {
-	s := spinner.New(spinner.CharSets[9], 100*time.Millisecond)
-	s.Suffix = " Starting the application..."
-	s.Start()
-	defer s.Stop()
-
-	cmd := exec.Command("go", "run", "main.go")
-	cmd.Dir = projectDir
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-
-	err := cmd.Run()
-	if err != nil {
-		fmt.Printf("Error starting the application: %v\n", err)
-		os.Exit(1)
-	}
-
-	s.Stop()
-	fmt.Println(color.New(color.FgGreen).Sprint("Application started successfully."))
 }
 
 func setDefaultValues() {

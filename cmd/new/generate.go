@@ -1,7 +1,6 @@
 package new
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -11,88 +10,58 @@ import (
 	"github.com/golang-programming/gincli/utils"
 )
 
-func createProjectFromTemplate(templateDir, projectDir string) {
-	s := spinner.New(spinner.CharSets[9], 100*time.Millisecond)
-	s.Suffix = " Creating project structure..."
-	s.Start()
-	defer s.Stop()
-
-	err := filepath.Walk(templateDir, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-
-		relativePath := strings.TrimPrefix(path, templateDir)
-		targetPath := filepath.Join(projectDir, relativePath)
-
-		if info.IsDir() {
-			return os.MkdirAll(targetPath, os.ModePerm)
-		}
-
-		if strings.HasSuffix(info.Name(), ".tpl") {
-			targetFile := strings.TrimSuffix(targetPath, ".tpl")
-			utils.GenerateFileFromTemplate(path, targetFile, nil)
-		}
-
-		return nil
-	})
-
-	if err != nil {
-		fmt.Printf("Error while copying templates: %v\n", err)
-	}
-}
-
-func generateProjectFiles(appName string, dbTypeChoice string, dbConfig map[string]string, projectDir string) {
+func generateProjectFiles(projectDir string) {
 	s := spinner.New(spinner.CharSets[9], 100*time.Millisecond)
 	s.Suffix = " Generating project files..."
 	s.Start()
 	defer s.Stop()
 
-	dbDriver := strings.ToLower(dbTypes[dbTypeChoice])
-	if dbDriver == "" {
-		dbDriver = "mysql"
-	}
-
 	templates := map[string]string{
-		"templates/new/.env.tpl":                         ".env",
-		"templates/new/loadEnv.go.tpl":                   "loadEnv.go",
-		"templates/new/app/pkg/database/database.go.tpl": "app/pkg/database/database.go",
-		"templates/new/app/service/service.go.tpl":       "app/service/service.go",
-		"templates/new/app/utils/sum-to-numbers.go.tpl":  "app/utils/sum-to-numbers.go",
-		"templates/new/Dockerfile.tpl":                   "Dockerfile",
+		"templates/new-app/.env.tpl":                         ".env",
+		"templates/new-app/loadEnv.go.tpl":                   "loadEnv.go",
+		"templates/new-app/app/pkg/database/database.go.tpl": "app/pkg/database/database.go",
+		"templates/new-app/app/service/service.go.tpl":       "app/service/service.go",
+		"templates/new-app/app/utils/sum-to-numbers.go.tpl":  "app/utils/sum-to-numbers.go",
+		"templates/new-app/Dockerfile.tpl":                   "Dockerfile",
+		"templates/new-app/main.go.tpl":                      "main.go",
+		"templates/new-app/routes.go.tpl":                    "routes.go",
+		"templates/new-app/app/controller/controller.go.tpl": "app/controller/controller.go",
 	}
-
-	if !useGraphQL {
-		templates["templates/new/main.go.tpl"] = "main.go"
-		templates["templates/new/routes.go.tpl"] = "routes.go"
-		templates["templates/new/app/controller/controller.go.tpl"] = "app/controller/controller.go"
-	} else {
-		templates["templates/new/graphql-main.go.tpl"] = "main.go"
-		templates["templates/new/app/resolver/resolver.go.tpl"] = "app/resolver/resolver.go"
-	}
-
-	fmt.Println("templates", templates)
 
 	for tpl, output := range templates {
-		config := dbConfig
-
-		config["Module"] = appName
-		config["DBDriver"] = dbDriver
-
-		utils.GenerateFileFromTemplate(tpl, filepath.Join(projectDir, output), config)
+		utils.GenerateFileFromTemplate(tpl, filepath.Join(projectDir, output), getConfig())
 	}
 
 	if dbTypeChoice == "1" || dbTypeChoice == "2" {
-		utils.GenerateFileFromTemplate("templates/new/docker-compose.yml.tpl", filepath.Join(projectDir, "docker-compose.yml"), map[string]string{"AppName": appName})
+		utils.GenerateFileFromTemplate("templates/new-app/docker-compose.yml.tpl", filepath.Join(projectDir, "docker-compose.yml"), getConfig())
 	}
 }
 
-func getDBConfig() map[string]string {
+func getConfig() map[string]string {
+	dbDriver := strings.ToLower(dbTypes[dbTypeChoice])
+
 	return map[string]string{
 		"DBUsername": dbUsername,
 		"DBPassword": dbPassword,
 		"DBName":     dbName,
 		"DBHost":     dbHost,
 		"DBPort":     dbPort,
+		"AppName":    appName,
+		"Module":     appName,
+		"DBDriver":   dbDriver,
 	}
+}
+
+func setupProjectDirectories() {
+	var directoriesPaths []string = []string{
+		appName + "/app/pkg/database",
+		appName + "/app/service",
+		appName + "/app/utils",
+		appName + "/app/controller",
+	}
+
+	for _, targetPath := range directoriesPaths {
+		os.MkdirAll(targetPath, os.ModePerm)
+	}
+
 }
