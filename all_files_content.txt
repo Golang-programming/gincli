@@ -1,0 +1,721 @@
+# Start the process from the current directory
+append_file_contents "."
+
+echo "All file contents have been written to $output_file."
+
+
+
+// ./cmd/new/generate.go
+package new
+
+import (
+	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
+	"time"
+
+	"github.com/briandowns/spinner"
+	"github.com/golang-programming/gincli/utils"
+)
+
+func createProjectFromTemplate(templateDir, projectDir string) {
+	s := spinner.New(spinner.CharSets[9], 100*time.Millisecond)
+	s.Suffix = " Creating project structure..."
+	s.Start()
+	defer s.Stop()
+
+	err := filepath.Walk(templateDir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		relativePath := strings.TrimPrefix(path, templateDir)
+		targetPath := filepath.Join(projectDir, relativePath)
+
+		if info.IsDir() {
+			return os.MkdirAll(targetPath, os.ModePerm)
+		}
+
+		if strings.HasSuffix(info.Name(), ".tpl") {
+			targetFile := strings.TrimSuffix(targetPath, ".tpl")
+			utils.GenerateFileFromTemplate(path, targetFile, nil)
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		fmt.Printf("Error while copying templates: %v\n", err)
+	}
+}
+
+func generateProjectFiles(appName string, dbTypeChoice string, dbConfig map[string]string, projectDir string) {
+	s := spinner.New(spinner.CharSets[9], 100*time.Millisecond)
+	s.Suffix = " Generating project files..."
+	s.Start()
+	defer s.Stop()
+
+	dbDriver := strings.ToLower(dbTypes[dbTypeChoice])
+	if dbDriver == "" {
+		dbDriver = "mysql"
+	}
+
+	templates := map[string]string{
+		"templates/new/.env.tpl":                         ".env",
+		"templates/new/main.go.tpl":                      "main.go",
+		"templates/new/loadEnv.go.tpl":                   "loadEnv.go",
+		"templates/new/routes.go.tpl":                    "routes.go",
+		"templates/new/app/pkg/database/database.go.tpl": "app/pkg/database/database.go",
+		"templates/new/app/controller/controller.go.tpl": "app/controller/controller.go",
+		"templates/new/app/service/service.go.tpl":       "app/service/service.go",
+		"templates/new/app/utils/sum-to-numbers.go.tpl":  "app/utils/sum-to-numbers.go",
+		"templates/new/Dockerfile.tpl":                   "Dockerfile",
+	}
+
+	for tpl, output := range templates {
+		config := dbConfig
+
+		config["Module"] = appName
+		config["DBDriver"] = dbDriver
+
+		utils.GenerateFileFromTemplate(tpl, filepath.Join(projectDir, output), config)
+	}
+
+	if dbTypeChoice == "1" || dbTypeChoice == "2" {
+		utils.GenerateFileFromTemplate("templates/new/docker-compose.yml.tpl", filepath.Join(projectDir, "docker-compose.yml"), map[string]string{"AppName": appName})
+	}
+}
+
+func getDBConfig() map[string]string {
+	return map[string]string{
+		"DBUsername": dbUsername,
+		"DBPassword": dbPassword,
+		"DBName":     dbName,
+		"DBHost":     dbHost,
+		"DBPort":     dbPort,
+	}
+}
+
+
+
+// ./cmd/new/new.go
+// cmd/new.go
+package new
+
+import (
+	"fmt"
+	"os"
+	"os/exec"
+	"path/filepath"
+	"time"
+
+	"github.com/briandowns/spinner"
+	"github.com/fatih/color"
+	"github.com/golang-programming/gincli/utils"
+	"github.com/spf13/cobra"
+)
+
+var (
+	appName            string
+	dbTypeChoice       string
+	dbHost             string
+	dbName             string
+	dbUsername         string
+	dbPassword         string
+	dbPort             string
+	dbConnectionString string
+	skipPrompts        bool
+)
+
+const (
+	defaultAppName      = "my-gin-app"
+	defaultDBUsername   = "root"
+	defaultDBPassword   = "password"
+	defaultDBName       = "default"
+	defaultDBHost       = "localhost"
+	defaultMySQLPort    = "3306"
+	defaultPostgresPort = "5432"
+)
+
+var dbTypes = map[string]string{
+	"1": "MySQL",
+	"2": "PostgreSQL",
+	"3": "SQLite",
+	"4": "MongoDB",
+}
+
+var NewCmd = &cobra.Command{
+	Use:   "new",
+	Short: "Create a new Gin application with a project structure",
+	Run:   createNewApp,
+}
+
+func init() {
+	NewCmd.Flags().StringVar(&appName, "app-name", "", fmt.Sprintf("Name of your application (default: %s)", defaultAppName))
+	NewCmd.Flags().StringVar(&dbTypeChoice, "db-type", "", "Database type: 1. MySQL, 2. PostgreSQL, 3. SQLite, 4. MongoDB (default: 1)")
+	NewCmd.Flags().StringVar(&dbConnectionString, "db-connection-string", "", "Database connection string")
+	NewCmd.Flags().StringVar(&dbHost, "db-host", "", fmt.Sprintf("Database host (default: %s)", defaultDBHost))
+	NewCmd.Flags().StringVar(&dbName, "db-name", "", fmt.Sprintf("Database name (default: %s)", defaultDBName))
+	NewCmd.Flags().StringVar(&dbUsername, "db-username", "", fmt.Sprintf("Database username (default: %s)", defaultDBUsername))
+	NewCmd.Flags().StringVar(&dbPassword, "db-password", "", fmt.Sprintf("Database password (default: %s)", defaultDBPassword))
+	NewCmd.Flags().StringVar(&dbPort, "db-port", "", "Database port (default: 3306 for MySQL, 5432 for PostgreSQL)")
+	NewCmd.Flags().BoolVarP(&skipPrompts, "yes", "y", false, "Skip all prompts and use default values")
+}
+
+func createNewApp(cmd *cobra.Command, args []string) {
+	if skipPrompts {
+		setDefaultValues()
+	} else {
+		promptForValues()
+	}
+
+	projectDir := filepath.Join(".", appName)
+	createProjectFromTemplate("templates/new", projectDir)
+
+	utils.InitializeGoModule(projectDir, appName)
+	generateProjectFiles(appName, dbTypeChoice, getDBConfig(), projectDir)
+
+	// Run go mod tidy with spinner
+	runGoModTidy(projectDir)
+
+	fmt.Println(color.New(color.FgGreen).Sprint("Application created successfully"))
+	fmt.Printf("Next steps:\n")
+	fmt.Printf("Go to project directory: cd %s\n", projectDir)
+	fmt.Printf("Run your project: go run *.go\n")
+}
+
+func runGoModTidy(projectDir string) {
+	s := spinner.New(spinner.CharSets[9], 100*time.Millisecond)
+	s.Suffix = " Running `go mod tidy`..."
+	s.Start()
+	defer s.Stop()
+
+	cmd := exec.Command("go", "mod", "tidy")
+	cmd.Dir = projectDir
+	err := cmd.Run()
+	if err != nil {
+		fmt.Printf("Error running `go mod tidy`: %v\n", err)
+		os.Exit(1)
+	}
+
+	s.Stop()
+	fmt.Println(color.New(color.FgGreen).Sprint("`go mod tidy` completed successfully."))
+}
+
+func startApplication(projectDir string) {
+	s := spinner.New(spinner.CharSets[9], 100*time.Millisecond)
+	s.Suffix = " Starting the application..."
+	s.Start()
+	defer s.Stop()
+
+	cmd := exec.Command("go", "run", "main.go")
+	cmd.Dir = projectDir
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	err := cmd.Run()
+	if err != nil {
+		fmt.Printf("Error starting the application: %v\n", err)
+		os.Exit(1)
+	}
+
+	s.Stop()
+	fmt.Println(color.New(color.FgGreen).Sprint("Application started successfully."))
+}
+
+func setDefaultValues() {
+	if appName == "" {
+		appName = defaultAppName
+	}
+	if dbTypeChoice == "" {
+		dbTypeChoice = "1"
+	}
+	if dbHost == "" {
+		dbHost = defaultDBHost
+	}
+	if dbName == "" {
+		dbName = defaultDBName
+	}
+	if dbUsername == "" {
+		dbUsername = defaultDBUsername
+	}
+	if dbPassword == "" {
+		dbPassword = defaultDBPassword
+	}
+	if dbPort == "" {
+		if dbTypeChoice == "2" {
+			dbPort = defaultPostgresPort
+		} else {
+			dbPort = defaultMySQLPort
+		}
+	}
+	if dbConnectionString == "" {
+		dbConnectionString = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", dbUsername, dbPassword, dbHost, dbPort, dbName)
+	}
+}
+
+
+
+// ./cmd/new/prompt.go
+// cmd/prompt.go
+package new
+
+import (
+	"fmt"
+	"strings"
+
+	"github.com/fatih/color"
+)
+
+func promptForValues() {
+	promptForAppName()
+	promptForDBType()
+	if dbConnectionString == "" {
+		promptForDBConfig()
+		dbConnectionString = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", dbUsername, dbPassword, dbHost, dbPort, dbName)
+	} else {
+		parseConnectionString(dbConnectionString)
+	}
+}
+
+func promptForAppName() {
+	if appName == "" {
+		fmt.Printf("Enter your app name [%s]: ", color.New(color.Faint).Sprint(defaultAppName))
+		fmt.Scanln(&appName)
+		if appName == "" {
+			appName = defaultAppName
+		}
+	}
+}
+
+func promptForDBType() {
+	if dbTypeChoice == "" {
+		defaultDBType := "1"
+		for {
+			fmt.Println("Select your database:")
+			for key, value := range dbTypes {
+				fmt.Printf("%s. %s\n", key, value)
+			}
+			fmt.Printf("Enter choice [%s]: ", color.New(color.Faint).Sprint(defaultDBType))
+			fmt.Scanln(&dbTypeChoice)
+			if dbTypeChoice == "" {
+				dbTypeChoice = defaultDBType
+			}
+			if _, exists := dbTypes[dbTypeChoice]; exists {
+				break
+			} else {
+				fmt.Println("Invalid choice, please select a valid option.")
+			}
+		}
+	}
+}
+
+func promptForDBConfig() {
+	if dbUsername == "" {
+		fmt.Printf("Enter DB username [%s]: ", color.New(color.Faint).Sprint(defaultDBUsername))
+		fmt.Scanln(&dbUsername)
+		if dbUsername == "" {
+			dbUsername = defaultDBUsername
+		}
+	}
+	if dbPassword == "" {
+		fmt.Printf("Enter DB password [%s]: ", color.New(color.Faint).Sprint(defaultDBPassword))
+		fmt.Scanln(&dbPassword)
+		if dbPassword == "" {
+			dbPassword = defaultDBPassword
+		}
+	}
+	if dbName == "" {
+		fmt.Printf("Enter DB name [%s]: ", color.New(color.Faint).Sprint(defaultDBName))
+		fmt.Scanln(&dbName)
+		if dbName == "" {
+			dbName = defaultDBName
+		}
+	}
+	if dbHost == "" {
+		fmt.Printf("Enter DB host [%s]: ", color.New(color.Faint).Sprint(defaultDBHost))
+		fmt.Scanln(&dbHost)
+		if dbHost == "" {
+			dbHost = defaultDBHost
+		}
+	}
+	if dbPort == "" {
+		defaultPort := defaultMySQLPort
+		if dbTypeChoice == "2" {
+			defaultPort = defaultPostgresPort
+		}
+		fmt.Printf("Enter DB port [%s]: ", color.New(color.Faint).Sprint(defaultPort))
+		fmt.Scanln(&dbPort)
+		if dbPort == "" {
+			dbPort = defaultPort
+		}
+	}
+}
+
+func parseConnectionString(connectionString string) {
+	parts := strings.Split(connectionString, "@")
+	if len(parts) == 2 {
+		dbCredentials := strings.Split(parts[0], ":")
+		if len(dbCredentials) == 2 {
+			dbUsername = dbCredentials[0]
+			dbPassword = dbCredentials[1]
+		}
+		dbHostAndPort := strings.Split(parts[1], "/")
+		hostPort := strings.TrimPrefix(dbHostAndPort[0], "tcp(")
+		hostPort = strings.TrimSuffix(hostPort, ")")
+		hostPortParts := strings.Split(hostPort, ":")
+		if len(hostPortParts) == 2 {
+			dbHost = hostPortParts[0]
+			dbPort = hostPortParts[1]
+		}
+		if len(dbHostAndPort) > 1 {
+			dbName = dbHostAndPort[1]
+		}
+	}
+}
+
+
+
+// ./cmd/root.go
+package cmd
+
+import (
+	"os"
+
+	"github.com/golang-programming/gincli/cmd/new"
+	"github.com/spf13/cobra"
+)
+
+var rootCmd = &cobra.Command{
+	Use:   "gincli",
+	Short: "CLI to generate Gin web applications with different components.",
+	Long:  `A CLI tool for building scalable Gin applications, with the ability to generate controllers, services, models, middleware, routes, and more.`,
+}
+
+// Execute adds all child commands to the root command and sets flags appropriately.
+func Execute() {
+	if err := rootCmd.Execute(); err != nil {
+		os.Exit(1)
+	}
+}
+
+func init() {
+	rootCmd.AddCommand(new.NewCmd)
+	// Removed: rootCmd.AddCommand(helpCmd)
+}
+
+
+
+// ./go.mod
+module github.com/golang-programming/gincli
+
+go 1.23.1
+
+require github.com/spf13/cobra v1.8.1
+
+require (
+	github.com/briandowns/spinner v1.23.1 // indirect
+	github.com/fatih/color v1.17.0 // indirect
+	github.com/inconshreveable/mousetrap v1.1.0 // indirect
+	github.com/mattn/go-colorable v0.1.13 // indirect
+	github.com/mattn/go-isatty v0.0.20 // indirect
+	github.com/spf13/pflag v1.0.5 // indirect
+	golang.org/x/sys v0.18.0 // indirect
+	golang.org/x/term v0.1.0 // indirect
+)
+
+// ./main.go
+package main
+
+import "github.com/golang-programming/gincli/cmd"
+
+func main() {
+    cmd.Execute()
+}
+
+// ./templates/new/app/controller/controller.go.tpl
+package controller
+
+import (
+    "github.com/gin-gonic/gin"
+    "{{.Module}}/app/service"
+)
+
+func Create(c *gin.Context) {
+    message := service.Create()
+    c.JSON(200, gin.H{
+        "message": message,
+    })
+}
+
+func GetAll(c *gin.Context) {
+    message := service.GetAll()
+    c.JSON(200, gin.H{
+        "message": message,
+    })
+}
+
+func GetById(c *gin.Context) {
+    // get ID from params
+    id := c.Param("id")
+    message := service.GetById(id)
+    c.JSON(200, gin.H{
+        "message": message,
+    })
+}
+
+func Update(c *gin.Context) {
+    message := service.Update()
+    c.JSON(200, gin.H{
+        "message": message,
+    })
+}
+
+func Delete(c *gin.Context) {
+    message := service.Delete()
+    c.JSON(200, gin.H{
+        "message": message,
+    })
+}
+
+
+// ./templates/new/app/pkg/database/database.go.tpl
+package database
+
+import (
+	"fmt"
+	"log"
+	"os"
+
+	"gorm.io/driver/{{.DBDriver}}"
+	"gorm.io/gorm"
+)
+
+var DB *gorm.DB
+
+func init() {
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+		os.Getenv("DB_USER"),
+		os.Getenv("DB_PASSWORD"),
+		os.Getenv("DB_HOST"),
+		os.Getenv("DB_PORT"),
+		os.Getenv("DB_NAME"))
+
+	db, err := gorm.Open({{.DBDriver}}.Open(dsn), &gorm.Config{})
+	if err != nil {
+		log.Fatal("Failed to connect to database:", err)
+	}
+
+	DB = db
+}
+
+
+// ./templates/new/app/service/service.go.tpl
+package service
+
+import "fmt"
+
+func Create() string {
+    return fmt.Sprintf("Create operation successfully performed")
+}
+func GetAll() string {
+    return fmt.Sprintf("Fetched all records successfully")
+}
+func GetById(id string) string {
+    return fmt.Sprintf("Fetched record with ID: %s", id)
+}
+func Update() string {
+    return fmt.Sprintf("Update operation successfully performed")
+}
+func Delete() string {
+    return fmt.Sprintf("Delete operation successfully performed")
+}
+
+
+// ./templates/new/app/utils/sum-to-numbers.go.tpl
+package utils
+
+func SumTwoNumbers(a int, b int) int {
+    return a + b
+}
+
+
+// ./templates/new/docker-compose.yml.tpl
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: "{{.AppName}}_app"
+    environment:
+      - DB_HOST=db
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+      - DB_PORT=3306
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+
+  db:
+    image: mysql:5.7
+    container_name: "{{.AppName}}_db"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+
+volumes:
+  db_data:
+
+
+
+// ./templates/new/Dockerfile.tpl
+FROM golang:1.19 as builder
+
+WORKDIR /app
+
+COPY go.mod go.sum ./
+
+RUN go mod download
+
+COPY . .
+
+RUN go build -o /docker-app
+
+FROM alpine:latest
+
+RUN apk --no-cache add ca-certificates
+
+WORKDIR /root/
+
+COPY --from=builder /docker-app .
+
+COPY .env .
+
+EXPOSE 8080
+
+CMD ["./docker-app"]
+
+
+
+// ./templates/new/loadEnv.go.tpl
+package main
+
+import (
+	"fmt"
+	"github.com/joho/godotenv"
+)
+
+func LoadEnv() {
+	fmt.Println("Loading environment variables from a configuration file")
+	godotenv.Load()
+}
+
+
+// ./templates/new/main.go.tpl
+package main
+
+import (
+    "github.com/gin-gonic/gin"
+    "os"
+)
+
+func main() {
+    app := gin.Default()
+
+    // Load port from .env
+    port := os.Getenv("PORT")
+    if port == "" {
+        port = "8080" // Default port if not specified in .env
+    }
+
+    router := app.Group("/api")
+    SetupRoutes(router)
+
+    app.Run(":" + port)
+}
+
+
+// ./templates/new/routes.go.tpl
+package main
+
+import (
+    "github.com/gin-gonic/gin"
+    "{{.Module}}/app/controller"
+)
+
+func SetupRoutes(r *gin.RouterGroup) {
+    r.POST("/", controller.Create)
+    r.GET("/", controller.GetAll)
+    r.GET("/:id", controller.GetById)
+    r.PUT("/", controller.Update)
+    r.DELETE("/", controller.Delete)
+}
+
+
+// ./utils/file_writer.go
+package utils
+
+import (
+	"fmt"
+	"os"
+	"os/exec"
+	"text/template"
+)
+
+// InitializeGoModule initializes the Go module without changing the working directory
+func InitializeGoModule(projectDir, appName string) {
+	// Instead of changing the working directory, use the full path for go mod init
+	cmd := exec.Command("go", "mod", "init", appName)
+	cmd.Dir = projectDir // Set the directory where the command should run
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		fmt.Printf("Error initializing Go module: %s\n", string(output))
+		return
+	}
+
+	fmt.Println("Go module initialized successfully!")
+}
+
+// GenerateFileFromTemplate generates a file from a template using explicit paths
+func GenerateFileFromTemplate(templatePath, outputPath string, data map[string]string) {
+	// Print the paths for debugging
+	// cwd, _ := os.Getwd()
+	// fmt.Println("Current working directory:", cwd)
+	// fmt.Println("Looking for template at:", templatePath)
+	// fmt.Println("Generating file at:", outputPath)
+
+	tmpl, err := template.ParseFiles(templatePath)
+	if err != nil {
+		fmt.Printf("Error parsing template: %s\n", err)
+		return
+	}
+
+	outputFile, err := os.Create(outputPath)
+	if err != nil {
+		fmt.Printf("Error creating file: %s\n", err)
+		return
+	}
+	defer outputFile.Close()
+
+	err = tmpl.Execute(outputFile, data)
+	if err != nil {
+		fmt.Printf("Error executing template: %s\n", err)
+		return
+	}
+
+	fmt.Printf("Generated file: %s\n", outputPath)
+}
+
+
+

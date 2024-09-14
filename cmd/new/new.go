@@ -69,7 +69,7 @@ func createNewApp(cmd *cobra.Command, args []string) {
 	}
 
 	projectDir := filepath.Join(".", appName)
-	createProjectFromTemplate("templates/new", projectDir)
+	// createProjectFromTemplate("templates/new", projectDir)
 
 	utils.InitializeGoModule(projectDir, appName)
 	generateProjectFiles(appName, dbTypeChoice, getDBConfig(), projectDir)

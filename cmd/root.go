@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/golang-programming/gincli/cmd/new"
+	"github.com/golang-programming/gincli/cmd/template"
 	"github.com/spf13/cobra"
 )
 
@@ -21,7 +22,7 @@ func Execute() {
 }
 
 func init() {
+	rootCmd.AddCommand(template.TemplateCmd)
 	rootCmd.AddCommand(new.NewCmd)
-	rootCmd.AddCommand(generateCmd)
 	// Removed: rootCmd.AddCommand(helpCmd)
 }

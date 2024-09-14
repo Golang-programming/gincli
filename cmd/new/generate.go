@@ -55,15 +55,23 @@ func generateProjectFiles(appName string, dbTypeChoice string, dbConfig map[stri
 
 	templates := map[string]string{
 		"templates/new/.env.tpl":                         ".env",
-		"templates/new/main.go.tpl":                      "main.go",
 		"templates/new/loadEnv.go.tpl":                   "loadEnv.go",
-		"templates/new/routes.go.tpl":                    "routes.go",
 		"templates/new/app/pkg/database/database.go.tpl": "app/pkg/database/database.go",
-		"templates/new/app/controller/controller.go.tpl": "app/controller/controller.go",
 		"templates/new/app/service/service.go.tpl":       "app/service/service.go",
 		"templates/new/app/utils/sum-to-numbers.go.tpl":  "app/utils/sum-to-numbers.go",
 		"templates/new/Dockerfile.tpl":                   "Dockerfile",
 	}
+
+	if !useGraphQL {
+		templates["templates/new/main.go.tpl"] = "main.go"
+		templates["templates/new/routes.go.tpl"] = "routes.go"
+		templates["templates/new/app/controller/controller.go.tpl"] = "app/controller/controller.go"
+	} else {
+		templates["templates/new/graphql-main.go.tpl"] = "main.go"
+		templates["templates/new/app/resolver/resolver.go.tpl"] = "app/resolver/resolver.go"
+	}
+
+	fmt.Println("templates", templates)
 
 	for tpl, output := range templates {
 		config := dbConfig
