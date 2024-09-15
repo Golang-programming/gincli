@@ -1,4 +1,4 @@
-package template
+package resource
 
 import (
 	"fmt"
@@ -11,19 +11,22 @@ import (
 	"github.com/golang-programming/gincli/utils"
 )
 
-func createProjectFromTemplate(templateDir, projectDir string) {
+func createResourceFromTemplate() {
+	templatePath := fmt.Sprintf("templates/others/resource/%s", transport)
+	resourcePath := fmt.Sprintf("app/modules/%s", resourceName)
+
 	s := spinner.New(spinner.CharSets[9], 100*time.Millisecond)
-	s.Suffix = " Creating project structure..."
+	s.Suffix = " Creating resource..."
 	s.Start()
 	defer s.Stop()
 
-	err := filepath.Walk(templateDir, func(path string, info os.FileInfo, err error) error {
+	err := filepath.Walk(templatePath, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
 
-		relativePath := strings.TrimPrefix(path, templateDir)
-		targetPath := filepath.Join(projectDir, relativePath)
+		relativePath := strings.TrimPrefix(path, templatePath)
+		targetPath := filepath.Join(resourcePath, relativePath)
 
 		if info.IsDir() {
 			return os.MkdirAll(targetPath, os.ModePerm)
@@ -44,13 +47,8 @@ func createProjectFromTemplate(templateDir, projectDir string) {
 
 func getConfig() map[string]string {
 	return map[string]string{
-		"DBUsername": dbUsername,
-		"DBPassword": dbPassword,
-		"DBName":     dbName,
-		"DBHost":     dbHost,
-		"DBPort":     dbPort,
-		"Module":     appName,
-		"Template":   availableTemplates[templateChoice],
-		"DBDriver":   dbTypes[dbTypeChoice],
+		"CapitalizeResourceName": utils.Capitalize(resourceName),
+		"ResourceName":           strings.ToLower(resourceName),
+		"Module":                 utils.DetectModuleName(),
 	}
 }

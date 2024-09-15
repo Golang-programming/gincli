@@ -36,13 +36,13 @@ var dbTypes = map[string]string{
 	"1": "MySQL",
 	"2": "PostgreSQL",
 	"3": "SQLite",
-	"4": "MongoDB",
 }
 
 var NewCmd = &cobra.Command{
-	Use:   "new",
-	Short: "Create a new Gin application with a project structure",
-	Run:   createNewApp,
+	Use:     "new",
+	Short:   "Create a new Gin application with a project structure",
+	Aliases: []string{"n", "create"},
+	Run:     createNewApp,
 }
 
 func init() {

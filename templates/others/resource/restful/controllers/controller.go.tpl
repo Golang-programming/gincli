@@ -6,53 +6,53 @@ import (
     "{{.Module}}/app/modules/{{.ResourceName}}/services"
 )
 
-func Create{{Capitalize .ResourceName}}(c *gin.Context) {
-    var input dtos.Create{{Capitalize .ResourceName}}Input
+func CreateCapitalizeResourceName(c *gin.Context) {
+    var input dtos.CreateCapitalizeResourceNameInput
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-    message := service.Create{{Capitalize .ResourceName}}(input)
+    message := service.CreateCapitalizeResourceName(input)
     c.JSON(200, gin.H{
         "message": message,
     })
 }
 
-func GetAll{{Capitalize .ResourceName}}s(c *gin.Context) {
-    message := service.GetAll{{Capitalize .ResourceName}}s()
+func GetAllCapitalizeResourceNames(c *gin.Context) {
+    message := service.GetAllCapitalizeResourceNames()
     c.JSON(200, gin.H{
         "message": message,
     })
 }
 
-func Get{{Capitalize .ResourceName}}ById(c *gin.Context) {
+func GetCapitalizeResourceNameById(c *gin.Context) {
     ID := c.Param("id")
 
-    message := service.Get{{Capitalize .ResourceName}}ById(ID)
+    message := service.GetCapitalizeResourceNameById(ID)
     c.JSON(200, gin.H{
         "message": message,
     })
 }
 
-func Update{{Capitalize .ResourceName}}(c *gin.Context) {
+func UpdateCapitalizeResourceName(c *gin.Context) {
     ID := c.Param("id")
-    var input dtos.Update{{Capitalize .ResourceName}}Input
+    var input dtos.UpdateCapitalizeResourceNameInput
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-    message := service.Update{{Capitalize .ResourceName}}(ID, input)
+    message := service.UpdateCapitalizeResourceName(ID, input)
     c.JSON(200, gin.H{
         "message": message,
     })
 }
 
-func Delete{{Capitalize .ResourceName}}(c *gin.Context) {
+func DeleteCapitalizeResourceName(c *gin.Context) {
     ID := c.Param("id")
 
-    message := service.Delete{{Capitalize .ResourceName}}(ID)
+    message := service.DeleteCapitalizeResourceName(ID)
     c.JSON(200, gin.H{
         "message": message,
     })

@@ -1,5 +1,5 @@
 package entities
 
-type {{Capitalize .ResourceName}} struct {
+type CapitalizeResourceName struct {
 	ID        uint           `gorm:"primaryKey;autoIncrement"`
 }

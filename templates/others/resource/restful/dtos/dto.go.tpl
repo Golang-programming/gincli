@@ -1,10 +1,10 @@
 package dtos
 
-type Create{{Capitalize .ResourceName}}Input struct {
+type CreateCapitalizeResourceNameInput struct {
 	Name         string            `json:"name" binding:"required"`
 }
 
 
-type Update{{Capitalize .ResourceName}}Input struct {
+type UpdateCapitalizeResourceNameInput struct {
 	Name         string            `json:"name" binding:"omitempty"`
 }
