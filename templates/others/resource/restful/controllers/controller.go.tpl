@@ -6,53 +6,53 @@ import (
     "{{.Module}}/app/modules/{{.ResourceName}}/services"
 )
 
-func CreateCapitalizeResourceName(c *gin.Context) {
-    var input dtos.CreateCapitalizeResourceNameInput
+func Create{{.CapitalizeResourceName}}(c *gin.Context) {
+    var input dtos.Create{{.CapitalizeResourceName}}Input
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-    message := service.CreateCapitalizeResourceName(input)
+    message := service.Create{{.CapitalizeResourceName}}(input)
     c.JSON(200, gin.H{
         "message": message,
     })
 }
 
-func GetAllCapitalizeResourceNames(c *gin.Context) {
-    message := service.GetAllCapitalizeResourceNames()
+func GetAll{{.CapitalizeResourceName}}s(c *gin.Context) {
+    message := service.GetAll{{.CapitalizeResourceName}}s()
     c.JSON(200, gin.H{
         "message": message,
     })
 }
 
-func GetCapitalizeResourceNameById(c *gin.Context) {
+func Get{{.CapitalizeResourceName}}ById(c *gin.Context) {
     ID := c.Param("id")
 
-    message := service.GetCapitalizeResourceNameById(ID)
+    message := service.Get{{.CapitalizeResourceName}}ById(ID)
     c.JSON(200, gin.H{
         "message": message,
     })
 }
 
-func UpdateCapitalizeResourceName(c *gin.Context) {
+func Update{{.CapitalizeResourceName}}(c *gin.Context) {
     ID := c.Param("id")
-    var input dtos.UpdateCapitalizeResourceNameInput
+    var input dtos.Update{{.CapitalizeResourceName}}Input
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-    message := service.UpdateCapitalizeResourceName(ID, input)
+    message := service.Update{{.CapitalizeResourceName}}(ID, input)
     c.JSON(200, gin.H{
         "message": message,
     })
 }
 
-func DeleteCapitalizeResourceName(c *gin.Context) {
+func Delete{{.CapitalizeResourceName}}(c *gin.Context) {
     ID := c.Param("id")
 
-    message := service.DeleteCapitalizeResourceName(ID)
+    message := service.Delete{{.CapitalizeResourceName}}(ID)
     c.JSON(200, gin.H{
         "message": message,
     })

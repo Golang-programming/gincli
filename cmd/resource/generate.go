@@ -14,6 +14,7 @@ import (
 func createResourceFromTemplate() {
 	templatePath := fmt.Sprintf("templates/others/resource/%s", transport)
 	resourcePath := fmt.Sprintf("app/modules/%s", resourceName)
+	utils.DetectModuleName()
 
 	s := spinner.New(spinner.CharSets[9], 100*time.Millisecond)
 	s.Suffix = " Creating resource..."
@@ -46,6 +47,7 @@ func createResourceFromTemplate() {
 }
 
 func getConfig() map[string]string {
+
 	return map[string]string{
 		"CapitalizeResourceName": utils.Capitalize(resourceName),
 		"ResourceName":           strings.ToLower(resourceName),

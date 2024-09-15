@@ -2,6 +2,7 @@ package utils
 
 import (
 	"bufio"
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -10,6 +11,7 @@ import (
 
 func DetectModuleName() string {
 	goModPath, err := filepath.Abs("go.mod")
+	fmt.Println("goModPath", goModPath)
 	if err != nil {
 		log.Fatal("Error determining the absolute path of go.mod: ", err)
 	}
