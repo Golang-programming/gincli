@@ -1,4 +1,4 @@
-// cmd/generate/service/generate.go
+// ./cmd/generate/service/generate.go
 package service
 
 import (
@@ -10,7 +10,7 @@ import (
 
 func generateServiceFile(projectDir string) {
 	templatePath := "templates/others/service.go.tpl"
-	outputPath := filepath.Join(projectDir, fmt.Sprintf("%s.service.go", serviceName))
+	outputPath := filepath.Join(projectDir, fmt.Sprintf("%s.service.go", utils.ConvertToSnakeCase(serviceName)))
 	config := map[string]string{
 		"Module":                utils.DetectModuleName(),
 		"ServiceName":           utils.ConvertToSnakeCase(serviceName),

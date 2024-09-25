@@ -1,11 +1,10 @@
-// cmd/generate/guard/guard.go
+// ./cmd/generate/guard/guard.go
 package guard
 
 import (
-	"fmt"
 	"path/filepath"
 
-	"github.com/fatih/color"
+	"github.com/golang-programming/gincli/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -21,9 +20,13 @@ var GuardCmd = &cobra.Command{
 	Run:   createGuard,
 }
 
+func init() {
+	// Add shorthand flags if needed in the future
+}
+
 func createGuard(cmd *cobra.Command, args []string) {
 	guardName = args[0]
-	defaultPath := filepath.Join(".", "app", guardName)
+	defaultPath := filepath.Join(".", "app", "guards", guardName)
 
 	if len(args) > 1 {
 		guardPath = args[1]
@@ -33,5 +36,5 @@ func createGuard(cmd *cobra.Command, args []string) {
 
 	generateGuardFile(guardPath)
 
-	fmt.Println(color.New(color.FgGreen).Sprint("Guard generated successfully"))
+	utils.LogSuccess("Guard generated successfully")
 }

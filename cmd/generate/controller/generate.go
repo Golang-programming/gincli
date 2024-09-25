@@ -1,4 +1,4 @@
-// cmd/generate/controller/generate.go
+// ./cmd/generate/controller/generate.go
 package controller
 
 import (
@@ -10,7 +10,7 @@ import (
 
 func generateControllerFile(projectDir string) {
 	templatePath := "templates/others/controller.go.tpl"
-	outputPath := filepath.Join(projectDir, fmt.Sprintf("%s.controller.go", controllerName))
+	outputPath := filepath.Join(projectDir, fmt.Sprintf("%s.controller.go", utils.ConvertToSnakeCase(controllerName)))
 	config := map[string]string{
 		"Module":                   utils.DetectModuleName(),
 		"ControllerName":           utils.ConvertToSnakeCase(controllerName),

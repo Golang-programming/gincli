@@ -1,10 +1,10 @@
+// ./cmd/generate/resource/resource.go
 package resource
 
 import (
-	"fmt"
 	"path/filepath"
 
-	"github.com/fatih/color"
+	"github.com/golang-programming/gincli/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -23,12 +23,12 @@ var (
 var ResourceCmd = &cobra.Command{
 	Use:   "resource <name> [path]",
 	Short: "Create a resource with pre-defined components",
-	Run:   createResource,
 	Args:  cobra.MinimumNArgs(1),
+	Run:   createResource,
 }
 
 func init() {
-	ResourceCmd.Flags().StringVar(&transport, "transport", "", "Available transports are ('Restful', 'WebSockets')")
+	ResourceCmd.Flags().StringVarP(&transport, "transport", "t", "", "Available transports are ('Restful', 'WebSockets')")
 }
 
 func createResource(cmd *cobra.Command, args []string) {
@@ -44,7 +44,7 @@ func createResource(cmd *cobra.Command, args []string) {
 
 	promptForValues()
 
-	createResourceFromTemplate()
+	generateResourceFromTemplate()
 
-	fmt.Println(color.New(color.FgGreen).Sprint("Resource created successfully"))
+	utils.LogSuccess("Resource created successfully")
 }

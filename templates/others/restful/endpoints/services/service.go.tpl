@@ -1,26 +1,31 @@
 package services
 
 import (
-    "fmt"
-    "{{.Module}}/app/modules/{{.ResourceName}}/dtos"
+	"fmt"
+	"{{.Module}}/app/modules/{{.ResourceName}}/dtos"
 )
 
 func Create{{.CapitalizeResourceName}}(input dtos.Create{{.CapitalizeResourceName}}Input) string {
-    return fmt.Sprintf("Create {{.ResourceName}} successfully")
+	// Implement your create logic here
+	return fmt.Sprintf("Create {{.ResourceName}} successfully")
 }
 
 func GetAll{{.CapitalizeResourceName}}s() string {
-    return fmt.Sprintf("Fetched all  {{.ResourceName}} successfully")
+	// Implement your get all logic here
+	return fmt.Sprintf("Fetched all {{.ResourceName}} successfully")
 }
 
 func Get{{.CapitalizeResourceName}}ById(ID string) string {
-    return fmt.Sprintf("Fetched  {{.ResourceName}} with ID: %s", ID)
+	// Implement your get by ID logic here
+	return fmt.Sprintf("Fetched {{.ResourceName}} with ID: %s", ID)
 }
 
-func Update{{.CapitalizeResourceName}}(ID string,input dtos.Update{{.CapitalizeResourceName}}Input) string {
-    return fmt.Sprintf("Update  {{.ResourceName}} successfully")
+func Update{{.CapitalizeResourceName}}(ID string, input dtos.Update{{.CapitalizeResourceName}}Input) string {
+	// Implement your update logic here
+	return fmt.Sprintf("Update {{.ResourceName}} successfully")
 }
 
-func Delete{{.CapitalizeResourceName}}(ID string, ) string {
-    return fmt.Sprintf("Delete  {{.ResourceName}} successfully")
+func Delete{{.CapitalizeResourceName}}(ID string) string {
+	// Implement your delete logic here
+	return fmt.Sprintf("Delete {{.ResourceName}} successfully")
 }

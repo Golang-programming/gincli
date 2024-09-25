@@ -1,3 +1,4 @@
+// ./cmd/template/prompt.go
 package template
 
 import (
@@ -59,9 +60,8 @@ func promptForDBConfig() {
 		survey.AskOne(prompt, &dbUsername)
 	}
 	if dbPassword == "" {
-		prompt := &survey.Input{
+		prompt := &survey.Password{
 			Message: fmt.Sprintf("Enter DB password [%s]: ", color.New(color.Faint).Sprint(defaultDBPassword)),
-			Default: defaultDBPassword,
 		}
 		survey.AskOne(prompt, &dbPassword)
 	}

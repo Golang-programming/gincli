@@ -1,11 +1,11 @@
-// cmd/generate/service/service.go
+// ./cmd/generate/service/service.go
 package service
 
 import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/fatih/color"
+	"github.com/golang-programming/gincli/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -21,6 +21,10 @@ var ServiceCmd = &cobra.Command{
 	Run:   createService,
 }
 
+func init() {
+	// Add shorthand flags if needed in the future
+}
+
 func createService(cmd *cobra.Command, args []string) {
 	serviceName = args[0]
 	defaultProjectDir := filepath.Join(".", "app", "modules", serviceName, "services")
@@ -34,5 +38,5 @@ func createService(cmd *cobra.Command, args []string) {
 
 	generateServiceFile(servicePath)
 
-	fmt.Println(color.New(color.FgGreen).Sprint("Service generated successfully at path: " + servicePath))
+	utils.LogSuccess(fmt.Sprintf("Service generated successfully at path: %s", servicePath))
 }

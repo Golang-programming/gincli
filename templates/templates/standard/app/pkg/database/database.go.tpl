@@ -6,7 +6,6 @@ import (
 	"os"
 
 	"gorm.io/driver/{{.DBDriver}}"
-	
 	"gorm.io/gorm"
 )
 
