@@ -11,18 +11,15 @@ import (
 )
 
 var (
-	appName            string
-	dbType             string
-	dbHost             string
-	dbName             string
-	dbUsername         string
-	dbPassword         string
-	dbPort             string
-	dbConnectionString string
-	skipPrompts        bool
-)
-
-const (
+	appName             string
+	dbType              string
+	dbHost              string
+	dbName              string
+	dbUsername          string
+	dbPassword          string
+	dbPort              string
+	dbConnectionString  string
+	skipPrompts         bool
 	defaultAppName      = "my-gin-app"
 	defaultDBType       = "MySQL"
 	defaultDBUsername   = "root"
@@ -31,13 +28,8 @@ const (
 	defaultDBHost       = "localhost"
 	defaultMySQLPort    = "3306"
 	defaultPostgresPort = "5432"
+	availableDBTypes    = []string{"MySQL", "PostgresQL", "SQlite"}
 )
-
-var availableDBTypes = []string{
-	"MySQL",
-	"PostgresQL",
-	"SQlite",
-}
 
 var NewCmd = &cobra.Command{
 	Use:     "new",

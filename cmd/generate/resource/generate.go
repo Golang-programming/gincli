@@ -14,6 +14,9 @@ import (
 func createResourceFromTemplate() {
 	templatePath := fmt.Sprintf("templates/others/resource/%s", strings.ToLower(transport))
 	resource := resourcePath + "/" + resourceName
+	if !createEndpoint {
+		templatePath = fmt.Sprintf("templates/others/resource/%s/blank", strings.ToLower(transport))
+	}
 
 	s := spinner.New(spinner.CharSets[9], 100*time.Millisecond)
 	s.Suffix = " Creating resource..."

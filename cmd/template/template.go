@@ -16,19 +16,16 @@ import (
 )
 
 var (
-	appName            string
-	dbType             string
-	dbHost             string
-	dbName             string
-	dbUsername         string
-	dbPassword         string
-	dbPort             string
-	dbConnectionString string
-	skipPrompts        bool
-	templateChoice     string
-)
-
-const (
+	appName               string
+	dbType                string
+	dbHost                string
+	dbName                string
+	dbUsername            string
+	dbPassword            string
+	dbPort                string
+	dbConnectionString    string
+	skipPrompts           bool
+	templateChoice        string
 	defaultAppName        = "my-gin-app"
 	defaultDBUsername     = "root"
 	defaultDBType         = "MySQL"
@@ -38,14 +35,9 @@ const (
 	defaultMySQLPort      = "3306"
 	defaultPostgresPort   = "5432"
 	defaultTemplateChoice = "Standard"
+	availableTemplates    = []string{"standard"}
+	availableDBTypes      = []string{"MySQL", "PostgresQL"}
 )
-
-var availableTemplates = []string{"standard"}
-
-var availableDBTypes = []string{
-	"MySQL",
-	"PostgresQL",
-}
 
 var TemplateCmd = &cobra.Command{
 	Use:   "template",

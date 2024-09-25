@@ -22,11 +22,11 @@ func promptForValues() {
 
 func promptForAppName() {
 	if appName == "" {
-		fmt.Printf("Enter your app name [%s]: ", color.New(color.Faint).Sprint(defaultAppName))
-		fmt.Scanln(&appName)
-		if appName == "" {
-			appName = defaultAppName
+		prompt := &survey.Input{
+			Message: fmt.Sprintf("Enter your app name [%s]: ", color.New(color.Faint).Sprint(defaultAppName)),
+			Default: defaultAppName,
 		}
+		survey.AskOne(prompt, &appName)
 	}
 }
 
@@ -42,45 +42,43 @@ func promptForDBType() {
 
 func promptForDBConfig() {
 	if dbUsername == "" {
-		fmt.Printf("Enter DB username [%s]: ", color.New(color.Faint).Sprint(defaultDBUsername))
-		fmt.Scanln(&dbUsername)
-		if dbUsername == "" {
-			dbUsername = defaultDBUsername
+		prompt := &survey.Input{
+			Message: fmt.Sprintf("Enter DB username [%s]: ", color.New(color.Faint).Sprint(defaultDBUsername)),
+			Default: defaultDBUsername,
 		}
+		survey.AskOne(prompt, &dbUsername)
 	}
 	if dbPassword == "" {
-		fmt.Printf("Enter DB password [%s]: ", color.New(color.Faint).Sprint(defaultDBPassword))
-		fmt.Scanln(&dbPassword)
-		if dbPassword == "" {
-			dbPassword = defaultDBPassword
+		prompt := &survey.Input{
+			Message: fmt.Sprintf("Enter DB password [%s]: ", color.New(color.Faint).Sprint(defaultDBPassword)),
+			Default: defaultDBPassword,
 		}
+		survey.AskOne(prompt, &dbPassword)
 	}
 	if dbName == "" {
-		fmt.Printf("Enter DB name [%s]: ", color.New(color.Faint).Sprint(defaultDBName))
-		fmt.Scanln(&dbName)
-		if dbName == "" {
-			dbName = defaultDBName
+		prompt := &survey.Input{
+			Message: fmt.Sprintf("Enter DB name [%s]: ", color.New(color.Faint).Sprint(defaultDBName)),
+			Default: defaultDBName,
 		}
+		survey.AskOne(prompt, &dbName)
 	}
 	if dbHost == "" {
-		fmt.Printf("Enter DB host [%s]: ", color.New(color.Faint).Sprint(defaultDBHost))
-		fmt.Scanln(&dbHost)
-		if dbHost == "" {
-			dbHost = defaultDBHost
+		prompt := &survey.Input{
+			Message: fmt.Sprintf("Enter DB host [%s]: ", color.New(color.Faint).Sprint(defaultDBHost)),
+			Default: defaultDBHost,
 		}
+		survey.AskOne(prompt, &dbHost)
 	}
 	if dbPort == "" {
 		defaultPort := defaultMySQLPort
-
 		if strings.ToLower(dbType) == "postgresql" {
 			defaultPort = defaultPostgresPort
 		}
-
-		fmt.Printf("Enter DB port [%s]: ", color.New(color.Faint).Sprint(defaultPort))
-		fmt.Scanln(&dbPort)
-		if dbPort == "" {
-			dbPort = defaultPort
+		prompt := &survey.Input{
+			Message: fmt.Sprintf("Enter DB port [%s]: ", color.New(color.Faint).Sprint(defaultPort)),
+			Default: defaultPort,
 		}
+		survey.AskOne(prompt, &dbPort)
 	}
 }
 

@@ -9,9 +9,10 @@ import (
 )
 
 var (
-	resourceName string
-	resourcePath string
-	transport    string
+	resourceName   string
+	resourcePath   string
+	transport      string
+	createEndpoint bool
 )
 
 var (
