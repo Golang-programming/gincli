@@ -50,7 +50,7 @@ func getConfig() map[string]string {
 		"DBHost":     dbHost,
 		"DBPort":     dbPort,
 		"Module":     appName,
-		"Template":   availableTemplates[templateChoice],
-		"DBDriver":   dbTypes[dbTypeChoice],
+		"Template":   strings.ToLower(templateChoice),
+		"DBDriver":   strings.ToLower(dbType),
 	}
 }

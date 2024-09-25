@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/briandowns/spinner"
@@ -16,7 +17,7 @@ import (
 
 var (
 	appName            string
-	dbTypeChoice       string
+	dbType             string
 	dbHost             string
 	dbName             string
 	dbUsername         string
@@ -28,25 +29,22 @@ var (
 )
 
 const (
-	defaultAppName      = "my-gin-app"
-	defaultDBUsername   = "root"
-	defaultDBPassword   = "password"
-	defaultDBName       = "default"
-	defaultDBHost       = "localhost"
-	defaultMySQLPort    = "3306"
-	defaultPostgresPort = "5432"
-	defaultTemplate     = "standard"
+	defaultAppName        = "my-gin-app"
+	defaultDBUsername     = "root"
+	defaultDBType         = "MySQL"
+	defaultDBPassword     = "password"
+	defaultDBName         = "default"
+	defaultDBHost         = "localhost"
+	defaultMySQLPort      = "3306"
+	defaultPostgresPort   = "5432"
+	defaultTemplateChoice = "Standard"
 )
 
-var availableTemplates = map[string]string{
-	"1": "standard",
-	"2": "graphql",
-}
+var availableTemplates = []string{"standard"}
 
-var dbTypes = map[string]string{
-	"1": "mysql",
-	"2": "pg",
-	"3": "sqlite",
+var availableDBTypes = []string{
+	"MySQL",
+	"PostgresQL",
 }
 
 var TemplateCmd = &cobra.Command{
@@ -56,9 +54,9 @@ var TemplateCmd = &cobra.Command{
 }
 
 func init() {
-	TemplateCmd.Flags().StringVar(&templateChoice, "template", "", fmt.Sprintf("Template: 1. Standard, 2. Graphql (default: %s)", defaultTemplate))
+	TemplateCmd.Flags().StringVar(&templateChoice, "template", "", fmt.Sprintf("Template: Standard (default: %s)", defaultTemplateChoice))
 	TemplateCmd.Flags().StringVar(&appName, "app-name", "", fmt.Sprintf("Name of your application (default: %s)", defaultAppName))
-	TemplateCmd.Flags().StringVar(&dbTypeChoice, "db-type", "", "Database type: 1. MySQL, 2. PostgreSQL")
+	TemplateCmd.Flags().StringVar(&dbType, "db-type", "", "Database type: MySQL, PostgreSQL")
 	TemplateCmd.Flags().StringVar(&dbConnectionString, "db-connection-string", "", "Database connection string")
 	TemplateCmd.Flags().StringVar(&dbHost, "db-host", "", fmt.Sprintf("Database host (default: %s)", defaultDBHost))
 	TemplateCmd.Flags().StringVar(&dbName, "db-name", "", fmt.Sprintf("Database name (default: %s)", defaultDBName))
@@ -76,7 +74,7 @@ func loadTemplate(cmd *cobra.Command, args []string) {
 	}
 
 	projectDir := filepath.Join(".", appName)
-	createProjectFromTemplate(fmt.Sprintf("templates/templates/%s", availableTemplates[templateChoice]), projectDir)
+	createProjectFromTemplate(fmt.Sprintf("templates/templates/%s", strings.ToLower(templateChoice)), projectDir)
 
 	utils.InitializeGoModule(projectDir, appName)
 
@@ -109,13 +107,13 @@ func runGoModTidy(projectDir string) {
 
 func setDefaultValues() {
 	if templateChoice == "" {
-		templateChoice = "1"
+		templateChoice = defaultTemplateChoice
 	}
 	if appName == "" {
 		appName = defaultAppName
 	}
-	if dbTypeChoice == "" {
-		dbTypeChoice = "1"
+	if dbType == "" {
+		dbType = defaultDBType
 	}
 	if dbHost == "" {
 		dbHost = defaultDBHost
@@ -130,7 +128,7 @@ func setDefaultValues() {
 		dbPassword = defaultDBPassword
 	}
 	if dbPort == "" {
-		if dbTypeChoice == "2" {
+		if strings.ToLower(dbType) == "postgresql" {
 			dbPort = defaultPostgresPort
 		} else {
 			dbPort = defaultMySQLPort

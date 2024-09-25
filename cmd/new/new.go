@@ -12,7 +12,7 @@ import (
 
 var (
 	appName            string
-	dbTypeChoice       string
+	dbType             string
 	dbHost             string
 	dbName             string
 	dbUsername         string
@@ -24,6 +24,7 @@ var (
 
 const (
 	defaultAppName      = "my-gin-app"
+	defaultDBType       = "MySQL"
 	defaultDBUsername   = "root"
 	defaultDBPassword   = "password"
 	defaultDBName       = "default"
@@ -32,10 +33,10 @@ const (
 	defaultPostgresPort = "5432"
 )
 
-var dbTypes = map[string]string{
-	"1": "MySQL",
-	"2": "PostgreSQL",
-	"3": "SQLite",
+var availableDBTypes = []string{
+	"MySQL",
+	"PostgresQL",
+	"SQlite",
 }
 
 var NewCmd = &cobra.Command{
@@ -47,7 +48,7 @@ var NewCmd = &cobra.Command{
 
 func init() {
 	NewCmd.Flags().StringVar(&appName, "app-name", "", fmt.Sprintf("Name of your application (default: %s)", defaultAppName))
-	NewCmd.Flags().StringVar(&dbTypeChoice, "db-type", "", "Database type: 1. MySQL, 2. PostgreSQL, 3. SQLite, 4. MongoDB (default: 1)")
+	NewCmd.Flags().StringVar(&dbType, "db-type", "", "Database type: MySQL, PostgreSQL, SQlite (default: MySQL)")
 	NewCmd.Flags().StringVar(&dbConnectionString, "db-connection-string", "", "Database connection string")
 	NewCmd.Flags().StringVar(&dbHost, "db-host", "", fmt.Sprintf("Database host (default: %s)", defaultDBHost))
 	NewCmd.Flags().StringVar(&dbName, "db-name", "", fmt.Sprintf("Database name (default: %s)", defaultDBName))
@@ -82,8 +83,8 @@ func setDefaultValues() {
 	if appName == "" {
 		appName = defaultAppName
 	}
-	if dbTypeChoice == "" {
-		dbTypeChoice = "1"
+	if dbType == "" {
+		dbType = defaultDBType
 	}
 	if dbHost == "" {
 		dbHost = defaultDBHost
@@ -98,7 +99,7 @@ func setDefaultValues() {
 		dbPassword = defaultDBPassword
 	}
 	if dbPort == "" {
-		if dbTypeChoice == "2" {
+		if dbType == defaultDBType {
 			dbPort = defaultPostgresPort
 		} else {
 			dbPort = defaultMySQLPort

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/AlecAivazis/survey/v2"
 	"github.com/fatih/color"
 )
 
@@ -21,26 +22,11 @@ func promptForValues() {
 
 func promptForTemplate() {
 	if templateChoice == "" {
-		defaultTemplate := "1"
-		for {
-			fmt.Println("Select your template:")
-			for key, value := range availableTemplates {
-				fmt.Printf("%s. %s\n", key, value)
-			}
-
-			fmt.Printf("Enter choice [%s]: ", color.New(color.Faint).Sprint(defaultTemplate))
-			fmt.Scanln(&templateChoice)
-
-			if templateChoice == "" {
-				templateChoice = defaultTemplate
-			}
-
-			if _, exists := availableTemplates[templateChoice]; exists {
-				break
-			} else {
-				fmt.Println("Invalid choice, please select a valid option.")
-			}
+		prompt := &survey.Select{
+			Message: fmt.Sprintf("Select a template you want to use: [%s]", color.New(color.Faint).Sprint(defaultTemplateChoice)),
+			Options: availableTemplates,
 		}
+		survey.AskOne(prompt, &templateChoice)
 	}
 }
 
@@ -55,24 +41,12 @@ func promptForAppName() {
 }
 
 func promptForDBType() {
-	if dbTypeChoice == "" {
-		defaultDBType := "1"
-		for {
-			fmt.Println("Select your database:")
-			for key, value := range dbTypes {
-				fmt.Printf("%s. %s\n", key, value)
-			}
-			fmt.Printf("Enter choice [%s]: ", color.New(color.Faint).Sprint(defaultDBType))
-			fmt.Scanln(&dbTypeChoice)
-			if dbTypeChoice == "" {
-				dbTypeChoice = defaultDBType
-			}
-			if _, exists := dbTypes[dbTypeChoice]; exists {
-				break
-			} else {
-				fmt.Println("Invalid choice, please select a valid option.")
-			}
+	if dbType == "" {
+		prompt := &survey.Select{
+			Message: fmt.Sprintf("Select your database: [%s]", color.New(color.Faint).Sprint(defaultDBType)),
+			Options: availableDBTypes,
 		}
+		survey.AskOne(prompt, &dbType)
 	}
 }
 
@@ -107,7 +81,7 @@ func promptForDBConfig() {
 	}
 	if dbPort == "" {
 		defaultPort := defaultMySQLPort
-		if dbTypeChoice == "2" {
+		if strings.ToLower(dbType) == "postgresql" {
 			defaultPort = defaultPostgresPort
 		}
 		fmt.Printf("Enter DB port [%s]: ", color.New(color.Faint).Sprint(defaultPort))

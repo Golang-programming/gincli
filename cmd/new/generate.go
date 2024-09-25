@@ -19,7 +19,6 @@ func generateProjectFiles(projectDir string) {
 	templates := map[string]string{
 		"templates/new-app/.env.tpl":                         ".env",
 		"templates/new-app/loadEnv.go.tpl":                   "loadEnv.go",
-		"templates/new-app/app/pkg/database/database.go.tpl": "app/pkg/database/database.go",
 		"templates/new-app/app/service/service.go.tpl":       "app/service/service.go",
 		"templates/new-app/app/utils/sum-to-numbers.go.tpl":  "app/utils/sum-to-numbers.go",
 		"templates/new-app/Dockerfile.tpl":                   "Dockerfile",
@@ -28,17 +27,21 @@ func generateProjectFiles(projectDir string) {
 		"templates/new-app/app/controller/controller.go.tpl": "app/controller/controller.go",
 	}
 
+	if strings.ToLower(dbType) != "sqlite" {
+		templates["templates/new-app/app/pkg/database/database.go.tpl"] = "app/pkg/database/database.go"
+		templates["templates/new-app/docker-compose.yml.tpl"] = "docker-compose.yml"
+	} else {
+		templates["templates/new-app/app/pkg/database/sqlite-database.go.tpl"] = "app/pkg/database/database.go"
+	}
+
 	for tpl, output := range templates {
 		utils.GenerateFileFromTemplate(tpl, filepath.Join(projectDir, output), getConfig())
 	}
 
-	if dbTypeChoice == "1" || dbTypeChoice == "2" {
-		utils.GenerateFileFromTemplate("templates/new-app/docker-compose.yml.tpl", filepath.Join(projectDir, "docker-compose.yml"), getConfig())
-	}
 }
 
 func getConfig() map[string]string {
-	dbDriver := strings.ToLower(dbTypes[dbTypeChoice])
+	dbDriver := strings.ToLower(dbType)
 
 	return map[string]string{
 		"DBUsername": dbUsername,
