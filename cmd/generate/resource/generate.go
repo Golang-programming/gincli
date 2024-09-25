@@ -1,82 +1,50 @@
-// cmd/generate/resource/generate.go
 package resource
 
-/*
-func createResource(cmd *cobra.Command, args []string) {
-	resourceName = args[0]
+import (
+	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
+	"time"
 
-	promptForValues()
+	"github.com/briandowns/spinner"
+	"github.com/golang-programming/gincli/utils"
+)
 
-	projectDir := filepath.Join(".", "app", "modules", resourceName)
-	utils.CreateDirectories([]string{
-		filepath.Join(projectDir, "controllers"),
-		filepath.Join(projectDir, "services"),
-		filepath.Join(projectDir, "dtos"),
-		filepath.Join(projectDir, "entities"),
+func createResourceFromTemplate() {
+	templatePath := fmt.Sprintf("templates/others/resource/%s", strings.ToLower(transport))
+	resource := resourcePath + "/" + resourceName
+
+	s := spinner.New(spinner.CharSets[9], 100*time.Millisecond)
+	s.Suffix = " Creating resource..."
+	s.Start()
+	defer s.Stop()
+
+	err := filepath.Walk(templatePath, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		relativePath := strings.TrimPrefix(path, templatePath)
+		targetPath := filepath.Join(resource, relativePath)
+
+		if strings.HasSuffix(info.Name(), ".tpl") {
+			targetFile := strings.TrimSuffix(targetPath, ".tpl")
+			utils.GenerateFileFromTemplate(path, targetFile, getConfig())
+		}
+
+		return nil
 	})
 
-	generateController(projectDir)
-	generateService(projectDir)
-	generateDTOs(projectDir)
-	generateEntities(projectDir)
-
-	if createEndpoints {
-		generateRoutes(projectDir)
+	if err != nil {
+		fmt.Printf("Error while copying templates: %v\n", err)
 	}
-
-	fmt.Println(color.New(color.FgGreen).Sprint("Resource generated successfully"))
 }
 
-func generateController(projectDir string) {
-	templatePath := "templates/generate/resource/controller.go.tpl"
-	outputPath := filepath.Join(projectDir, "controllers", "controller.go")
-	config := map[string]string{
+func getConfig() map[string]string {
+	return map[string]string{
+		"CapitalizeResourceName": utils.Capitalize(resourceName),
+		"ResourceName":           utils.ConvertToSnakeCase(resourceName),
 		"Module":                 utils.DetectModuleName(),
-		"ResourceName":           resourceName,
-		"CapitalizeResourceName": utils.Capitalize(resourceName),
 	}
-	utils.GenerateFileFromTemplate(templatePath, outputPath, config)
 }
-
-func generateService(projectDir string) {
-	templatePath := "templates/generate/resource/service.go.tpl"
-	outputPath := filepath.Join(projectDir, "services", "service.go")
-	config := map[string]string{
-		"Module":                 utils.DetectModuleName(),
-		"ResourceName":           resourceName,
-		"CapitalizeResourceName": utils.Capitalize(resourceName),
-	}
-	utils.GenerateFileFromTemplate(templatePath, outputPath, config)
-}
-
-func generateDTOs(projectDir string) {
-	templatePath := "templates/generate/resource/dto.go.tpl"
-	outputPath := filepath.Join(projectDir, "dtos", "dto.go")
-	config := map[string]string{
-		"ResourceName":           resourceName,
-		"CapitalizeResourceName": utils.Capitalize(resourceName),
-	}
-	utils.GenerateFileFromTemplate(templatePath, outputPath, config)
-}
-
-func generateEntities(projectDir string) {
-	templatePath := "templates/generate/resource/entity.go.tpl"
-	outputPath := filepath.Join(projectDir, "entities", "entity.go")
-	config := map[string]string{
-		"ResourceName":           resourceName,
-		"CapitalizeResourceName": utils.Capitalize(resourceName),
-	}
-	utils.GenerateFileFromTemplate(templatePath, outputPath, config)
-}
-
-func generateRoutes(projectDir string) {
-	templatePath := "templates/generate/resource/routes.go.tpl"
-	outputPath := filepath.Join(projectDir, "routes.go")
-	config := map[string]string{
-		"Module":                 utils.DetectModuleName(),
-		"ResourceName":           resourceName,
-		"CapitalizeResourceName": utils.Capitalize(resourceName),
-	}
-	utils.GenerateFileFromTemplate(templatePath, outputPath, config)
-}
-*/

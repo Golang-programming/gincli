@@ -1,5 +1,5 @@
-// cmd/generate/service/generate.go
-package service
+// cmd/generate/guard/generate.go
+package guard
 
 import (
 	"fmt"
@@ -8,13 +8,13 @@ import (
 	"github.com/golang-programming/gincli/utils"
 )
 
-func generateServiceFile(projectDir string) {
-	templatePath := "templates/others/service.go.tpl"
-	outputPath := filepath.Join(projectDir, fmt.Sprintf("%s.service.go", serviceName))
+func generateGuardFile(projectDir string) {
+	templatePath := "templates/others/guard.go.tpl"
+	outputPath := filepath.Join(projectDir, fmt.Sprintf("%s.guard.go", guardName))
 	config := map[string]string{
-		"Module":                utils.DetectModuleName(),
-		"ServiceName":           utils.ConvertToSnakeCase(serviceName),
-		"CapitalizeServiceName": utils.Capitalize(serviceName),
+		"Module":              utils.DetectModuleName(),
+		"GuardName":           utils.ConvertToSnakeCase(guardName),
+		"CapitalizeGuardName": utils.Capitalize(guardName),
 	}
 	utils.GenerateFileFromTemplate(templatePath, outputPath, config)
 }

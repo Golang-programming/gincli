@@ -1,5 +1,5 @@
-// cmd/generate/service/service.go
-package service
+// cmd/generate/guard/guard.go
+package guard
 
 import (
 	"fmt"
@@ -10,23 +10,28 @@ import (
 )
 
 var (
-	serviceName string
+	guardName string
+	guardPath string
 )
 
-var ServiceCmd = &cobra.Command{
-	Use:   "service <name>",
-	Short: "Generate a new service",
-	Run:   createService,
+var GuardCmd = &cobra.Command{
+	Use:   "guard <name> [path]",
+	Short: "Generate a new guard",
+	Args:  cobra.MinimumNArgs(1),
+	Run:   createGuard,
 }
 
-func createService(cmd *cobra.Command, args []string) {
-	serviceName = args[0]
+func createGuard(cmd *cobra.Command, args []string) {
+	guardName = args[0]
+	defaultPath := filepath.Join(".", "app", guardName)
 
-	promptForValues()
+	if len(args) > 1 {
+		guardPath = args[1]
+	} else {
+		guardPath = defaultPath
+	}
 
-	projectDir := filepath.Join(".", "app", "modules", serviceName, "services")
+	generateGuardFile(guardPath)
 
-	generateServiceFile(projectDir)
-
-	fmt.Println(color.New(color.FgGreen).Sprint("Service generated successfully"))
+	fmt.Println(color.New(color.FgGreen).Sprint("Guard generated successfully"))
 }
