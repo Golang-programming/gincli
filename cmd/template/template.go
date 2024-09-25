@@ -3,13 +3,9 @@ package template
 
 import (
 	"fmt"
-	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
-	"time"
 
-	"github.com/briandowns/spinner"
 	"github.com/fatih/color"
 	"github.com/golang-programming/gincli/utils"
 	"github.com/spf13/cobra"
@@ -70,31 +66,12 @@ func loadTemplate(cmd *cobra.Command, args []string) {
 
 	utils.InitializeGoModule(projectDir, appName)
 
-	// Run go mod tidy with spinner
-	runGoModTidy(projectDir)
+	utils.RunGoModTidy(projectDir)
 
 	fmt.Println(color.New(color.FgGreen).Sprint("Template loaded successfully"))
 	fmt.Printf("Next steps:\n")
 	fmt.Printf("Go to project directory: cd %s\n", projectDir)
 	fmt.Printf("Run your project: go run *.go\n")
-}
-
-func runGoModTidy(projectDir string) {
-	s := spinner.New(spinner.CharSets[9], 100*time.Millisecond)
-	s.Suffix = " Running `go mod tidy`..."
-	s.Start()
-	defer s.Stop()
-
-	cmd := exec.Command("go", "mod", "tidy")
-	cmd.Dir = projectDir
-	err := cmd.Run()
-	if err != nil {
-		fmt.Printf("Error running `go mod tidy`: %v\n", err)
-		os.Exit(1)
-	}
-
-	s.Stop()
-	fmt.Println(color.New(color.FgGreen).Sprint("`go mod tidy` completed successfully."))
 }
 
 func setDefaultValues() {
