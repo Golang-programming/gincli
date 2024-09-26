@@ -62,6 +62,7 @@ func init() {
 	GenerateCmd.AddCommand(controller.ControllerCmd)
 	GenerateCmd.AddCommand(service.ServiceCmd)
 	GenerateCmd.AddCommand(route.RouteCmd)
+
 	// Set the custom help function
 	GenerateCmd.SetHelpFunc(CustomGenerateHelpFunc)
 }

@@ -35,8 +35,8 @@ sudo mv gin /usr/local/bin/
 Alternatively, clone the repository and build the tool yourself:
 
 ```bash
-git clone https://github.com/golang-programming/gincli.git
-cd gincli
+git clone https://github.com/golang-programming/gincli.git gin
+cd gin
 go build -o gin
 sudo mv gin /usr/local/bin/
 ```
