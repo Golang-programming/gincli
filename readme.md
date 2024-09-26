@@ -1,416 +1,135 @@
 # Gin CLI - Scaffold Your Gin Application
 
-![Gin CLI Logo](path/to/logo.png) <!-- Optional: Add a logo image -->
-
-Gin CLI is a powerful command-line tool designed to help you quickly set up [Gin Web Framework](https://gin-gonic.com/) applications with a predefined project structure and essential components. Focus on building your application without worrying about the initial setup!
-
-## Table of Contents
-
-1. [Features](#features)
-2. [Installation](#installation)
-3. [Usage](#usage)
-    - [Available Commands](#available-commands)
-    - [Command Aliases](#command-aliases)
-4. [Commands Overview](#commands-overview)
-    - [`new`](#new)
-    - [`generate`](#generate)
-        - [`generate controller`](#generate-controller)
-        - [`generate guard`](#generate-guard)
-        - [`generate resource`](#generate-resource)
-        - [`generate route`](#generate-route)
-        - [`generate service`](#generate-service)
-    - [`template`](#template)
-5. [Examples](#examples)
-6. [Running the Application](#running-the-application)
-7. [Notes](#notes)
-8. [Support](#support)
-
----
+Gin CLI is a straightforward command-line tool that helps you quickly set up [Gin Web Framework](https://gin-gonic.com/) applications with a predefined project structure and essential components. Focus on developing your application without worrying about the initial setup!
 
 ## Features
 
-- **Quick Scaffold**: Generate a new Gin application with a standard project layout.
-- **Modular Generation**: Create controllers, guards, resources, routes, and services effortlessly.
-- **Database Configuration**: Supports MySQL, PostgreSQL, SQLite, and MongoDB.
-- **User-Friendly**: Interactive prompts with default values for an enhanced user experience.
-- **Colorful Logs**: Distinctive colors for informational, success, warning, and error messages.
-- **Shorthand Flags**: Use single-letter flags for faster command inputs.
-- **Safe File Generation**: Prompts before overwriting existing files to prevent data loss.
-- **Enhanced Help**: Displays commands and flags in a neatly formatted table similar to NestJS CLI.
+- **Quick Application Setup**: Generate a new Gin application with a standard project layout.
+- **Component Generation**: Easily create controllers, guards, resources, routes, and services.
+- **Database Support**: Configure your app with MySQL, PostgreSQL, SQLite, or MongoDB.
+- **User-Friendly Prompts**: Interactive prompts with sensible defaults for a smoother experience.
+- **Shorthand Commands**: Utilize command aliases and shorthand flags for efficiency.
+- **Safe File Handling**: Prompts before overwriting existing files to prevent data loss.
+- **Enhanced Help Command**: Displays commands and flags in a clean, tabular format.
 
 ## Installation
 
 ### Prerequisites
 
-- **Go**: Ensure you have Go installed (version 1.16 or later). [Download Go](https://golang.org/dl/)
-- **Git**: Required to clone the repository. [Download Git](https://git-scm.com/downloads)
+- **Go**: Make sure you have Go installed (version 1.16 or later). [Download Go](https://golang.org/dl/)
+- **Git**: Required if cloning the repository. [Download Git](https://git-scm.com/downloads)
 
-### Steps
+### Install via `curl`
 
-1. **Clone the Repository**
+You can quickly install the CLI tool using `curl`. Replace `<version>` with the latest release version.
 
-   ```bash
-   git clone https://github.com/golang-programming/gincli.git
-   cd gincli
-   ```
+```bash
+# Replace <version> with the actual version, e.g., v1.0.0
+curl -LO https://github.com/golang-programming/gincli/releases/download/<version>/gin
+chmod +x gin
+sudo mv gin /usr/local/bin/
+```
 
-2. **Build the CLI Tool**
+### Build from Source
 
-   ```bash
-   go build -o gin
-   ```
+Alternatively, clone the repository and build the tool yourself:
 
-3. **Move the Executable to Your PATH**
-
-   ```bash
-   mv gin /usr/local/bin/
-   ```
-
-   *Note: You might need `sudo` permissions depending on your system.*
-
-4. **Verify Installation**
-
-   ```bash
-   gin --version
-   ```
-
-   You should see output indicating the installed version of Gin CLI.
+```bash
+git clone https://github.com/golang-programming/gincli.git
+cd gincli
+go build -o gin
+sudo mv gin /usr/local/bin/
+```
 
 ## Usage
 
-Generate and manage your Gin applications seamlessly using the following commands.
+Create and manage your Gin applications using simple commands.
 
 ### Available Commands
 
-| Command       | Description                                           |
-|---------------|-------------------------------------------------------|
-| `new`         | Create a new Gin application with a project structure |
-| `generate`    | Generate resources, controllers, guards, routes, and services |
-| `template`    | Load application startup templates                    |
+- `new` (Aliases: `n`, `create`): Create a new Gin application.
+- `generate` (Alias: `g`): Generate components like controllers, guards, etc.
+- `template` (Alias: `t`): Load application startup templates.
 
 ### Command Aliases
 
-Aliases allow you to use shorter or alternative names for commands.
+Use aliases for quicker command input:
 
-| Command    | Aliases        |
-|------------|----------------|
-| `new`      | `n`, `create`  |
-| `generate` | `g`            |
-| `template` | `t`            |
+- **new**: `n`, `create`
+- **generate**: `g`
+- **template**: `t`
 
-#### Subcommand Aliases for `generate`
+#### Generate Subcommand Aliases
 
-| Subcommand       | Aliases |
-|------------------|---------|
-| `generate controller` | `c` |
-| `generate guard`      | `gd` |
-| `generate resource`   | `r` |
-| `generate route`      | `rt` |
-| `generate service`    | `s` |
-
-*Note: Subcommand aliases are prefixed with `generate`. For example, `c` is an alias for `generate controller`.*
-
----
+- **controller**: `c`
+- **guard**: `gd`
+- **resource**: `r`
+- **route**: `rt`
+- **service**: `s`
 
 ## Commands Overview
 
 ### `new`
 
-**Description**: Create a new Gin application with a predefined project structure.
-
-**Aliases**: `n`, `create`
-
-**Usage**:
+Create a new Gin application with a predefined structure.
 
 ```bash
 gin new [flags]
 ```
 
-**Flags**:
+**Flags:**
 
-| Flag                      | Shorthand | Description                                   | Default                                   |
-|---------------------------|-----------|-----------------------------------------------|-------------------------------------------|
-| `--app-name`              | `-a`      | Name of your application                      | `my-gin-app`                              |
-| `--db-type`               | `-d`      | Database type (`MySQL`, `PostgreSQL`, `SQLite`, `MongoDB`) | `MySQL`                              |
-| `--db-connection-string`  | `-c`      | Custom database connection string             | *(None)*                                  |
-| `--db-host`               | `-H`      | Database host                                 | `localhost`                               |
-| `--db-name`               | `-n`      | Database name                                 | `default`                                 |
-| `--db-username`           | `-u`      | Database username                             | `root`                                    |
-| `--db-password`           | `-p`      | Database password                             | `password`                                |
-| `--db-port`               | `-P`      | Database port (default varies by DB type)     | `3306` (MySQL), `5432` (PostgreSQL)       |
-| `--yes`                   | `-y`      | Skip all prompts and use default values       | `false`                                   |
-
----
+- `--app-name`, `-a`: Application name (default: `my-gin-app`)
+- `--db-type`, `-d`: Database type (`MySQL`, `PostgreSQL`, `SQLite`, `MongoDB`)
+- `--db-username`, `-u`: Database username (default: `root`)
+- `--db-password`, `-p`: Database password (default: `password`)
+- `--yes`, `-y`: Skip prompts and use default values
 
 ### `generate`
 
-**Description**: Generate various components such as controllers, guards, resources, routes, and services to build a modular application structure.
-
-**Aliases**: `g`
-
-**Usage**:
+Generate components for your application.
 
 ```bash
 gin generate [subcommand] [flags]
 ```
 
-**Available Subcommands**:
+**Subcommands and Aliases:**
 
-| Subcommand       | Description                  |
-|------------------|------------------------------|
-| `controller`     | Generate a new controller    |
-| `guard`          | Generate a new guard         |
-| `resource`       | Generate a new resource      |
-| `route`          | Generate a new route         |
-| `service`        | Generate a new service       |
-
-#### Subcommand Flags
-
-Each subcommand may have its own specific flags. Refer to individual subcommand documentation for details.
-
----
-
-#### `generate controller`
-
-**Description**: Generate a new controller for handling HTTP requests.
-
-**Aliases**: `c`
-
-**Usage**:
-
-```bash
-gin generate controller <name> [path] [flags]
-```
-
-**Arguments**:
-
-- `<name>`: Name of the controller.
-- `[path]`: (Optional) Custom path where the controller should be generated.
-
-**Example**:
-
-```bash
-gin g c user
-```
-
----
-
-#### `generate guard`
-
-**Description**: Generate a new guard for implementing authentication or authorization logic.
-
-**Aliases**: `gd`
-
-**Usage**:
-
-```bash
-gin generate guard <name> [path] [flags]
-```
-
-**Arguments**:
-
-- `<name>`: Name of the guard.
-- `[path]`: (Optional) Custom path where the guard should be generated.
-
-**Example**:
-
-```bash
-gin g gd auth
-```
-
----
-
-#### `generate resource`
-
-**Description**: Generate a new resource with predefined components like controllers, DTOs, entities, and services.
-
-**Aliases**: `r`
-
-**Usage**:
-
-```bash
-gin generate resource <name> [path] [flags]
-```
-
-**Arguments**:
-
-- `<name>`: Name of the resource.
-- `[path]`: (Optional) Custom path where the resource should be generated.
-
-**Flags**:
-
-| Flag          | Shorthand | Description                        | Default    |
-|---------------|-----------|------------------------------------|------------|
-| `--transport` | `-t`      | Transport layer (`Restful`, `WebSockets`) | `Restful` |
-
-**Example**:
-
-```bash
-gin g r product -t Restful
-```
-
----
-
-#### `generate route`
-
-**Description**: Generate a new route for your application.
-
-**Aliases**: `rt`
-
-**Usage**:
-
-```bash
-gin generate route <name> [path] [flags]
-```
-
-**Arguments**:
-
-- `<name>`: Name of the route.
-- `[path]`: (Optional) Custom path where the route should be generated.
-
-**Example**:
-
-```bash
-gin g rt user
-```
-
----
-
-#### `generate service`
-
-**Description**: Generate a new service layer for business logic.
-
-**Aliases**: `s`
-
-**Usage**:
-
-```bash
-gin generate service <name> [path] [flags]
-```
-
-**Arguments**:
-
-- `<name>`: Name of the service.
-- `[path]`: (Optional) Custom path where the service should be generated.
-
-**Example**:
-
-```bash
-gin g s payment
-```
-
----
+- `controller` (`c`): Generate a new controller.
+- `guard` (`gd`): Generate a new guard.
+- `resource` (`r`): Generate a new resource.
+- `route` (`rt`): Generate a new route.
+- `service` (`s`): Generate a new service.
 
 ### `template`
 
-**Description**: Load application startup templates to set up different project configurations.
-
-**Aliases**: `t`
-
-**Usage**:
+Load an application startup template.
 
 ```bash
 gin template [flags]
 ```
 
-**Flags**:
+**Flags:**
 
-| Flag                      | Shorthand | Description                                   | Default        |
-|---------------------------|-----------|-----------------------------------------------|----------------|
-| `--template`              | `-t`      | Template to use (`Standard`)                  | `Standard`     |
-| `--app-name`              | `-a`      | Name of your application                      | `my-gin-app`   |
-| `--db-type`               | `-d`      | Database type (`MySQL`, `PostgreSQL`)         | `MySQL`        |
-| `--db-connection-string`  | `-c`      | Custom database connection string             | *(None)*       |
-| `--db-host`               | `-H`      | Database host                                 | `localhost`    |
-| `--db-name`               | `-n`      | Database name                                 | `default`      |
-| `--db-username`           | `-u`      | Database username                             | `root`         |
-| `--db-password`           | `-p`      | Database password                             | `password`     |
-| `--db-port`               | `-P`      | Database port (default varies by DB type)     | `3306` or `5432`|
-| `--yes`                   | `-y`      | Skip all prompts and use default values       | `false`        |
-
-**Example**:
-
-```bash
-gin t -a ecommerce -d PostgreSQL -y
-```
-
----
+- `--template`, `-t`: Template to use (default: `Standard`)
+- `--app-name`, `-a`: Application name (default: `my-gin-app`)
+- `--yes`, `-y`: Skip prompts and use default values
 
 ## Examples
 
-### 1. **Create a New Application with Defaults**
-
-Generates a new Gin application named `my-gin-app` with MySQL as the default database.
+### Create a New Application
 
 ```bash
-gin new
+gin new -a myapp
 ```
 
 Or using aliases:
 
 ```bash
-gin n
+gin n -a myapp
 ```
 
-### 2. **Create a New Application with a Custom Name**
-
-Generates a new Gin application named `shop-api`.
-
-```bash
-gin new --app-name shop-api
-```
-
-Or using shorthand flags:
-
-```bash
-gin n -a shop-api
-```
-
-### 3. **Specify Database Type and Credentials**
-
-Generates a new Gin application with PostgreSQL as the database.
-
-```bash
-gin new --db-type PostgreSQL --db-username admin --db-password secret
-```
-
-Or using shorthand flags:
-
-```bash
-gin n -d PostgreSQL -u admin -p secret
-```
-
-### 4. **Use a Custom Database Connection String**
-
-Generates a new Gin application using a custom database connection string.
-
-```bash
-gin new --db-connection-string "user:pass@tcp(localhost:3306)/dbname"
-```
-
-Or using shorthand flags:
-
-```bash
-gin n -c "user:pass@tcp(localhost:3306)/dbname"
-```
-
-### 5. **Skip All Prompts**
-
-Generates a new Gin application using all default values without any interactive prompts.
-
-```bash
-gin new --yes
-```
-
-Or using shorthand flags:
-
-```bash
-gin n -y
-```
-
-### 6. **Generate a New Controller**
-
-Creates a new controller named `user`.
+### Generate a Controller
 
 ```bash
 gin generate controller user
@@ -422,56 +141,38 @@ Or using aliases:
 gin g c user
 ```
 
-### 7. **Generate a New Guard**
-
-Creates a new guard named `auth`.
+### Generate a Resource with Restful Transport
 
 ```bash
-gin generate guard auth
+gin generate resource product -t Restful
 ```
 
-Or using aliases:
-
-```bash
-gin g gd auth
-```
-
-### 8. **Generate a New Resource**
-
-Creates a new resource named `product` with Restful transport.
-
-```bash
-gin generate resource product --transport Restful
-```
-
-Or using shorthand flags:
+Or using shorthand:
 
 ```bash
 gin g r product -t Restful
 ```
 
-### 9. **Load a Template**
-
-Loads the standard template to set up the project structure.
+### Load a Template
 
 ```bash
-gin template
+gin template -a ecommerce -y
 ```
 
 Or using aliases:
 
 ```bash
-gin t
+gin t -a ecommerce -y
 ```
 
 ## Running the Application
 
-After generating your application, navigate to the project directory and run your Gin server.
+After generating your application:
 
 1. **Navigate to the Project Directory**
 
    ```bash
-   cd my-gin-app
+   cd myapp
    ```
 
 2. **Run the Application**
@@ -480,42 +181,18 @@ After generating your application, navigate to the project directory and run you
    go run *.go
    ```
 
-   *Alternatively, you can build the application and run the binary:*
-
-   ```bash
-   go build -o app
-   ./app
-   ```
-
 ## Notes
 
-- **Environment Variables**: Ensure that all necessary environment variables are set in the `.env` file. The CLI tool automatically loads environment variables during project setup.
-- **Dependencies**: The CLI tool runs `go mod tidy` to manage dependencies. Ensure you have an active internet connection during this process.
-- **Templates**: You can customize templates located in the `templates/` directory to fit your project's specific needs.
-- **Extensibility**: The CLI is designed to be modular. Feel free to add new commands or extend existing ones as your project evolves.
+- **Environment Variables**: Ensure your `.env` file is correctly set up.
+- **Dependencies**: The CLI runs `go mod tidy` to manage dependencies.
+- **Customization**: Feel free to modify templates in the `templates/` directory.
 
 ## Support
 
-If you encounter any issues or have suggestions for improvements, feel free to open an issue on the [GitHub Repository](https://github.com/golang-programming/gincli/issues).
-
-For direct support, you can reach out via email:
+For issues or suggestions, please open an issue on the [GitHub Repository](https://github.com/golang-programming/gincli/issues) or contact:
 
 📧 [zeshanshakil0@gmail.com](mailto:zeshanshakil0@gmail.com)
 
 ---
 
-## Contribution
-
-Contributions are welcome! If you'd like to contribute to Gin CLI, please fork the repository and submit a pull request with your changes. Ensure that your code follows the project's coding standards and includes appropriate documentation.
-
----
-
-## License
-
-This project is licensed under the [MIT License](LICENSE).
-
----
-
 **Happy Coding!** 🚀
-
----

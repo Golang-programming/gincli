@@ -14,10 +14,11 @@ var (
 )
 
 var GuardCmd = &cobra.Command{
-	Use:   "guard <name> [path]",
-	Short: "Generate a new guard",
-	Args:  cobra.MinimumNArgs(1),
-	Run:   createGuard,
+	Use:     "guard <name> [path]",
+	Short:   "Generate a new guard",
+	Aliases: []string{"gd"},
+	Args:    cobra.MinimumNArgs(1),
+	Run:     createGuard,
 }
 
 func init() {

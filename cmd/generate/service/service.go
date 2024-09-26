@@ -15,10 +15,11 @@ var (
 )
 
 var ServiceCmd = &cobra.Command{
-	Use:   "service <name> [path]",
-	Short: "Generate a new service",
-	Args:  cobra.MinimumNArgs(1), // Ensure at least one argument (service name) is provided
-	Run:   createService,
+	Use:     "service <name> [path]",
+	Short:   "Generate a new service",
+	Aliases: []string{"s"},
+	Args:    cobra.MinimumNArgs(1), // Ensure at least one argument (service name) is provided
+	Run:     createService,
 }
 
 func init() {

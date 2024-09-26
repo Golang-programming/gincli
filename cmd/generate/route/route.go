@@ -15,10 +15,11 @@ var (
 )
 
 var RouteCmd = &cobra.Command{
-	Use:   "route <name> [path]",
-	Short: "Generate a new route",
-	Args:  cobra.MinimumNArgs(1),
-	Run:   createRoute,
+	Use:     "route <name> [path]",
+	Short:   "Generate a new route",
+	Aliases: []string{"rt"},
+	Args:    cobra.MinimumNArgs(1),
+	Run:     createRoute,
 }
 
 func init() {

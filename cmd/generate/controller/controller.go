@@ -15,10 +15,11 @@ var (
 )
 
 var ControllerCmd = &cobra.Command{
-	Use:   "controller <name> [path]",
-	Short: "Generate a new controller",
-	Args:  cobra.MinimumNArgs(1), // Ensures at least one argument (controller name) is passed
-	Run:   createController,
+	Use:     "controller <name> [path]",
+	Short:   "Generate a new controller",
+	Aliases: []string{"c"},
+	Args:    cobra.MinimumNArgs(1), // Ensures at least one argument (controller name) is passed
+	Run:     createController,
 }
 
 func init() {

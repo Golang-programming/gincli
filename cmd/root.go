@@ -1,3 +1,4 @@
+// ./cmd/root.go
 package cmd
 
 import (
@@ -20,19 +21,20 @@ func CustomHelpFunc(cmd *cobra.Command, args []string) {
 		utils.LogInfo("Available Commands:")
 
 		table := tablewriter.NewWriter(os.Stdout)
-		table.SetHeader([]string{"Command", "Description"})
+		table.SetHeader([]string{"Command", "Aliases", "Description"})
 
 		commands := []struct {
 			Name        string
+			Aliases     string
 			Description string
 		}{
-			{"new", "Create a new Gin application with a project structure"},
-			{"generate", "Generate resources, controllers, services, and routes"},
-			{"template", "Load application startup template"},
+			{"new", "n, create", "Create a new Gin application with a project structure"},
+			{"generate", "g", "Generate resources, controllers, guards, routes, and services"},
+			{"template", "t", "Load application startup templates"},
 		}
 
 		for _, cmd := range commands {
-			table.Append([]string{cmd.Name, cmd.Description})
+			table.Append([]string{cmd.Name, cmd.Aliases, cmd.Description})
 		}
 
 		table.Render()
