@@ -21,13 +21,53 @@ Gin CLI is a straightforward command-line tool that helps you quickly set up [Gi
 
 ### Install via `curl`
 
-You can quickly install the CLI tool using `curl`. Replace `<version>` with the latest release version.
+You can quickly install the CLI tool using `curl`. Replace `<version>` with the latest release version, e.g., `v1.0.0`.
+
+#### For Linux and macOS:
 
 ```bash
 # Replace <version> with the actual version, e.g., v1.0.0
-curl -LO https://github.com/golang-programming/gincli/releases/download/<version>/gin
-chmod +x gin
-sudo mv gin /usr/local/bin/
+curl -LO https://github.com/golang-programming/gincli/releases/download/<version>/gin-<os>-amd64
+
+# Make it executable
+chmod +x gin-<os>-amd64
+
+# Move it to a directory in your PATH
+sudo mv gin-<os>-amd64 /usr/local/bin/gin
+
+# Verify installation
+gin --version
+```
+
+Replace `<os>` with `linux` or `darwin` depending on your operating system.
+
+**Example for Linux:**
+
+```bash
+curl -LO https://github.com/golang-programming/gincli/releases/download/v1.0.0/gin-linux-amd64
+chmod +x gin-linux-amd64
+sudo mv gin-linux-amd64 /usr/local/bin/gin
+gin --version
+```
+
+**Example for macOS:**
+
+```bash
+curl -LO https://github.com/golang-programming/gincli/releases/download/v1.0.0/gin-darwin-amd64
+chmod +x gin-darwin-amd64
+sudo mv gin-darwin-amd64 /usr/local/bin/gin
+gin --version
+```
+
+#### For Windows (Using PowerShell):
+
+```powershell
+# Replace <version> with the actual version, e.g., v1.0.0
+Invoke-WebRequest -Uri "https://github.com/golang-programming/gincli/releases/download/<version>/gin-windows-amd64.exe" -OutFile "gin.exe"
+
+# Ensure gin.exe is in your PATH
+# Verify installation
+.\gin.exe --version
 ```
 
 ### Build from Source
@@ -35,8 +75,8 @@ sudo mv gin /usr/local/bin/
 Alternatively, clone the repository and build the tool yourself:
 
 ```bash
-git clone https://github.com/golang-programming/gincli.git gin
-cd gin
+git clone https://github.com/golang-programming/gincli.git
+cd gincli
 go build -o gin
 sudo mv gin /usr/local/bin/
 ```
@@ -77,6 +117,8 @@ Create a new Gin application with a predefined structure.
 gin new [flags]
 ```
 
+**Aliases:** `n`, `create`
+
 **Flags:**
 
 - `--app-name`, `-a`: Application name (default: `my-gin-app`)
@@ -93,6 +135,8 @@ Generate components for your application.
 gin generate [subcommand] [flags]
 ```
 
+**Alias:** `g`
+
 **Subcommands and Aliases:**
 
 - `controller` (`c`): Generate a new controller.
@@ -108,6 +152,8 @@ Load an application startup template.
 ```bash
 gin template [flags]
 ```
+
+**Alias:** `t`
 
 **Flags:**
 
