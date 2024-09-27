@@ -2,8 +2,6 @@
 package utils
 
 import (
-	"bytes"
-	"embed"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -12,33 +10,12 @@ import (
 	"github.com/AlecAivazis/survey/v2"
 )
 
-var newAppTemplates embed.FS
-var otherTemplates embed.FS
-
-func GenerateFileFromTemplate(templateName, outputPath string, data map[string]string) {
-	var tmplFS embed.FS
-	switch {
-	case filepath.Dir(templateName) == "templates/templates":
-		tmplFS = newAppTemplates
-	case filepath.Dir(templateName) == "templates/new-app":
-		tmplFS = newAppTemplates
-	case filepath.Dir(templateName) == "templates/others":
-		tmplFS = otherTemplates
-	default:
-		LogError(fmt.Sprintf("Unknown template directory: %s", filepath.Dir(templateName)))
-	}
-
-	tmplContent, err := tmplFS.ReadFile(templateName)
-	if err != nil {
-		LogError(fmt.Sprintf("Error reading embedded template: %s", err))
-	}
-
-	tmpl, err := template.New(filepath.Base(templateName)).Parse(string(tmplContent))
-	if err != nil {
-		LogError(fmt.Sprintf("Error parsing template: %s", err))
-	}
-
+// GenerateFileFromTemplate generates a file from a template using explicit paths.
+// It prompts the user before overwriting existing files.
+func GenerateFileFromTemplate(templatePath, outputPath string, data map[string]string) {
+	// Check if the file already exists
 	if _, err := os.Stat(outputPath); err == nil {
+		// File exists, prompt for overwrite
 		overwrite := false
 		prompt := &survey.Confirm{
 			Message: fmt.Sprintf("File %s already exists. Do you want to overwrite it?", outputPath),
@@ -51,19 +28,28 @@ func GenerateFileFromTemplate(templateName, outputPath string, data map[string]s
 		}
 	}
 
+	// Create the directories if they do not exist
 	if err := CreateDirectories(filepath.Dir(outputPath)); err != nil {
 		LogError(fmt.Sprintf("Error creating directories: %s", err))
 	}
 
-	var buf bytes.Buffer
-	err = tmpl.Execute(&buf, data)
+	// Parse the template
+	tmpl, err := template.ParseFiles(templatePath)
 	if err != nil {
-		LogError(fmt.Sprintf("Error executing template: %s", err))
+		LogError(fmt.Sprintf("Error parsing template: %s", err))
 	}
 
-	err = os.WriteFile(outputPath, buf.Bytes(), 0644)
+	// Create or truncate the output file
+	outputFile, err := os.Create(outputPath)
 	if err != nil {
-		LogError(fmt.Sprintf("Error writing file: %s", err))
+		LogError(fmt.Sprintf("Error creating file: %s", err))
+	}
+	defer outputFile.Close()
+
+	// Execute the template with provided data
+	err = tmpl.Execute(outputFile, data)
+	if err != nil {
+		LogError(fmt.Sprintf("Error executing template: %s", err))
 	}
 
 	LogSuccess(fmt.Sprintf("Generated file: %s", outputPath))
