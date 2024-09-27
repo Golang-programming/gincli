@@ -1,4 +1,4 @@
-// cmd/generate/route/generate.go
+// ./cmd/generate/route/generate.go
 package route
 
 import (
@@ -10,8 +10,7 @@ import (
 
 func generateRouteFile(projectDir string) {
 	templatePath := "templates/others/route.go.tpl"
-	outputPath := filepath.Join(projectDir, fmt.Sprintf("%s.route.go", routeName))
-
+	outputPath := filepath.Join(projectDir, fmt.Sprintf("%s.route.go", utils.ConvertToSnakeCase(routeName)))
 	config := map[string]string{
 		"Module":              utils.DetectModuleName(),
 		"RouteName":           utils.ConvertToSnakeCase(routeName),

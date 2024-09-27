@@ -1,52 +1,56 @@
+// ./utils/file_writer.go
 package utils
 
 import (
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"text/template"
+
+	"github.com/AlecAivazis/survey/v2"
 )
 
-// InitializeGoModule initializes the Go module without changing the working directory
-func InitializeGoModule(projectDir, appName string) {
-	cmd := exec.Command("go", "mod", "init", appName)
-	cmd.Dir = projectDir // Set the directory where the command should run
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		fmt.Printf("Error initializing Go module: %s\n", string(output))
-		return
+// GenerateFileFromTemplate generates a file from a template using explicit paths.
+// It prompts the user before overwriting existing files.
+func GenerateFileFromTemplate(templatePath, outputPath string, data map[string]string) {
+	// Check if the file already exists
+	if _, err := os.Stat(outputPath); err == nil {
+		// File exists, prompt for overwrite
+		overwrite := false
+		prompt := &survey.Confirm{
+			Message: fmt.Sprintf("File %s already exists. Do you want to overwrite it?", outputPath),
+			Default: false,
+		}
+		survey.AskOne(prompt, &overwrite)
+		if !overwrite {
+			LogWarning(fmt.Sprintf("Skipped generating file: %s", outputPath))
+			return
+		}
 	}
 
-	fmt.Println("Go module initialized successfully!")
-}
-
-// GenerateFileFromTemplate generates a file from a template using explicit paths
-func GenerateFileFromTemplate(templatePath, outputPath string, data map[string]string) {
 	// Create the directories if they do not exist
 	if err := CreateDirectories(filepath.Dir(outputPath)); err != nil {
-		fmt.Printf("Error creating directories: %s\n", err)
-		return
+		LogError(fmt.Sprintf("Error creating directories: %s", err))
 	}
 
+	// Parse the template
 	tmpl, err := template.ParseFiles(templatePath)
 	if err != nil {
-		fmt.Printf("Error parsing template: %s\n", err)
-		return
+		LogError(fmt.Sprintf("Error parsing template: %s", err))
 	}
 
+	// Create or truncate the output file
 	outputFile, err := os.Create(outputPath)
 	if err != nil {
-		fmt.Printf("Error creating file: %s\n", err)
-		return
+		LogError(fmt.Sprintf("Error creating file: %s", err))
 	}
 	defer outputFile.Close()
 
+	// Execute the template with provided data
 	err = tmpl.Execute(outputFile, data)
 	if err != nil {
-		fmt.Printf("Error executing template: %s\n", err)
-		return
+		LogError(fmt.Sprintf("Error executing template: %s", err))
 	}
 
-	fmt.Printf("Generated file: %s\n", outputPath)
+	LogSuccess(fmt.Sprintf("Generated file: %s", outputPath))
 }

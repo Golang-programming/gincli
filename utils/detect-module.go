@@ -1,24 +1,24 @@
+// ./utils/detect-module.go
 package utils
 
 import (
 	"bufio"
 	"fmt"
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
 )
 
+// DetectModuleName retrieves the module name from go.mod.
 func DetectModuleName() string {
 	goModPath, err := filepath.Abs("go.mod")
-	fmt.Println("goModPath", goModPath)
 	if err != nil {
-		log.Fatal("Error determining the absolute path of go.mod: ", err)
+		LogError(fmt.Sprintf("Error determining the absolute path of go.mod: %s", err))
 	}
 
 	file, err := os.Open(goModPath)
 	if err != nil {
-		log.Fatalf("Error opening go.mod file. Please ensure you are in the root directory of your project. Error: %v", err)
+		LogError(fmt.Sprintf("Error opening go.mod file: %s", err))
 	}
 	defer file.Close()
 
@@ -34,9 +34,9 @@ func DetectModuleName() string {
 	}
 
 	if err := scanner.Err(); err != nil {
-		log.Fatalf("Error reading go.mod file: %v", err)
+		LogError(fmt.Sprintf("Error reading go.mod file: %s", err))
 	}
 
-	log.Fatal("Module name not found in go.mod. Please ensure you are in the root directory of your project and that the go.mod file contains a valid module name.")
+	LogError("Module name not found in go.mod. Please ensure you are in the root directory of your project and that the go.mod file contains a valid module name.")
 	return ""
 }

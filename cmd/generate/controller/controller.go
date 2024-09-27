@@ -1,11 +1,11 @@
-// cmd/generate/controller/controller.go
+// ./cmd/generate/controller/controller.go
 package controller
 
 import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/fatih/color"
+	"github.com/golang-programming/gincli/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -15,10 +15,15 @@ var (
 )
 
 var ControllerCmd = &cobra.Command{
-	Use:   "controller <name> [path]",
-	Short: "Generate a new controller",
-	Args:  cobra.MinimumNArgs(1), // Ensures at least one argument (controller name) is passed
-	Run:   createController,
+	Use:     "controller <name> [path]",
+	Short:   "Generate a new controller",
+	Aliases: []string{"c"},
+	Args:    cobra.MinimumNArgs(1), // Ensures at least one argument (controller name) is passed
+	Run:     createController,
+}
+
+func init() {
+	// Add shorthand flags if needed in the future
 }
 
 func createController(cmd *cobra.Command, args []string) {
@@ -34,5 +39,5 @@ func createController(cmd *cobra.Command, args []string) {
 
 	generateControllerFile(controllerPath)
 
-	fmt.Println(color.New(color.FgGreen).Sprint("Controller generated successfully at path: " + controllerPath))
+	utils.LogSuccess(fmt.Sprintf("Controller generated successfully at path: %s", controllerPath))
 }

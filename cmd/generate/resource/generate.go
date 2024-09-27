@@ -1,3 +1,4 @@
+// ./cmd/generate/resource/generate.go
 package resource
 
 import (
@@ -11,7 +12,7 @@ import (
 	"github.com/golang-programming/gincli/utils"
 )
 
-func createResourceFromTemplate() {
+func generateResourceFromTemplate() {
 	templatePath := fmt.Sprintf("templates/others/resource/%s", strings.ToLower(transport))
 	resource := resourcePath + "/" + resourceName
 	if !createEndpoint {
@@ -40,7 +41,7 @@ func createResourceFromTemplate() {
 	})
 
 	if err != nil {
-		fmt.Printf("Error while copying templates: %v\n", err)
+		utils.LogError(fmt.Sprintf("Error while copying templates: %v", err))
 	}
 }
 

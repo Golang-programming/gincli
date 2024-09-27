@@ -1,10 +1,10 @@
+// ./cmd/generate/resource/prompt.go
 package resource
 
 import (
 	"fmt"
 
 	"github.com/AlecAivazis/survey/v2"
-
 	"github.com/fatih/color"
 )
 
@@ -24,9 +24,11 @@ func promptForTransport() {
 }
 
 func promptForEndpoints() {
-	endpointPrompt := &survey.Confirm{
-		Message: "Do you want to create an endpoint?",
-		Default: true,
+	if !createEndpoint {
+		prompt := &survey.Confirm{
+			Message: "Do you want to create endpoints?",
+			Default: true,
+		}
+		survey.AskOne(prompt, &createEndpoint)
 	}
-	survey.AskOne(endpointPrompt, &createEndpoint)
 }

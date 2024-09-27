@@ -6,6 +6,7 @@ import (
 
 func {{.CapitalizeMiddlewareName}}Middleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		// Implement your middleware logic here
 		c.Next()
 	}
 }

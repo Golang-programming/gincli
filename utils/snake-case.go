@@ -1,3 +1,4 @@
+// ./utils/snake-case.go
 package utils
 
 import (
@@ -5,11 +6,10 @@ import (
 	"strings"
 )
 
+// ConvertToSnakeCase converts a string to snake_case.
 func ConvertToSnakeCase(text string) string {
-	// Regular expression to match spaces or punctuation
+	// Replace non-word characters with underscores
 	reg := regexp.MustCompile(`[^\w]+`)
-
-	// Replace spaces and punctuation with underscores
 	snake := reg.ReplaceAllString(text, "_")
 
 	// Insert underscore before any uppercase letters followed by lowercase letters

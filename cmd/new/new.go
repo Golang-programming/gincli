@@ -1,11 +1,11 @@
-// cmd/new.go
+// ./cmd/new/new.go
 package new
 
 import (
 	"fmt"
 	"path/filepath"
+	"strings"
 
-	"github.com/fatih/color"
 	"github.com/golang-programming/gincli/utils"
 	"github.com/spf13/cobra"
 )
@@ -28,7 +28,7 @@ var (
 	defaultDBHost       = "localhost"
 	defaultMySQLPort    = "3306"
 	defaultPostgresPort = "5432"
-	availableDBTypes    = []string{"MySQL", "PostgresQL", "SQlite"}
+	availableDBTypes    = []string{"MySQL", "PostgreSQL", "SQLite", "MongoDB"}
 )
 
 var NewCmd = &cobra.Command{
@@ -39,14 +39,14 @@ var NewCmd = &cobra.Command{
 }
 
 func init() {
-	NewCmd.Flags().StringVar(&appName, "app-name", "", fmt.Sprintf("Name of your application (default: %s)", defaultAppName))
-	NewCmd.Flags().StringVar(&dbType, "db-type", "", "Database type: MySQL, PostgreSQL, SQlite (default: MySQL)")
-	NewCmd.Flags().StringVar(&dbConnectionString, "db-connection-string", "", "Database connection string")
-	NewCmd.Flags().StringVar(&dbHost, "db-host", "", fmt.Sprintf("Database host (default: %s)", defaultDBHost))
-	NewCmd.Flags().StringVar(&dbName, "db-name", "", fmt.Sprintf("Database name (default: %s)", defaultDBName))
-	NewCmd.Flags().StringVar(&dbUsername, "db-username", "", fmt.Sprintf("Database username (default: %s)", defaultDBUsername))
-	NewCmd.Flags().StringVar(&dbPassword, "db-password", "", fmt.Sprintf("Database password (default: %s)", defaultDBPassword))
-	NewCmd.Flags().StringVar(&dbPort, "db-port", "", "Database port (default: 3306 for MySQL, 5432 for PostgreSQL)")
+	NewCmd.Flags().StringVarP(&appName, "app-name", "a", "", fmt.Sprintf("Name of your application (default: %s)", defaultAppName))
+	NewCmd.Flags().StringVarP(&dbType, "db-type", "d", "", "Database type: MySQL, PostgreSQL, SQLite, MongoDB (default: MySQL)")
+	NewCmd.Flags().StringVarP(&dbConnectionString, "db-connection-string", "c", "", "Database connection string")
+	NewCmd.Flags().StringVarP(&dbHost, "db-host", "H", "", fmt.Sprintf("Database host (default: %s)", defaultDBHost))
+	NewCmd.Flags().StringVarP(&dbName, "db-name", "n", "", fmt.Sprintf("Database name (default: %s)", defaultDBName))
+	NewCmd.Flags().StringVarP(&dbUsername, "db-username", "u", "", fmt.Sprintf("Database username (default: %s)", defaultDBUsername))
+	NewCmd.Flags().StringVarP(&dbPassword, "db-password", "p", "", fmt.Sprintf("Database password (default: %s)", defaultDBPassword))
+	NewCmd.Flags().StringVarP(&dbPort, "db-port", "P", "", "Database port (default: 3306 for MySQL, 5432 for PostgreSQL)")
 	NewCmd.Flags().BoolVarP(&skipPrompts, "yes", "y", false, "Skip all prompts and use default values")
 }
 
@@ -61,14 +61,14 @@ func createNewApp(cmd *cobra.Command, args []string) {
 	setupProjectDirectories()
 	generateProjectFiles(projectDir)
 
-	// Run go mod tidy with spinner
+	// Run go mod tidy with spinner handled inside the utility
 	utils.InitializeGoModule(projectDir, appName)
 	utils.RunGoModTidy(projectDir)
 
-	fmt.Println(color.New(color.FgGreen).Sprint("Application created successfully"))
-	fmt.Printf("Next steps:\n")
-	fmt.Printf("Go to project directory: cd %s\n", projectDir)
-	fmt.Printf("Run your project: go run *.go\n")
+	utils.LogSuccess("Application created successfully")
+	fmt.Println("Next steps:")
+	fmt.Printf("  Go to project directory: cd %s\n", projectDir)
+	fmt.Println("  Run your project: go run *.go")
 }
 
 func setDefaultValues() {
@@ -91,7 +91,7 @@ func setDefaultValues() {
 		dbPassword = defaultDBPassword
 	}
 	if dbPort == "" {
-		if dbType == defaultDBType {
+		if strings.ToLower(dbType) == "postgresql" {
 			dbPort = defaultPostgresPort
 		} else {
 			dbPort = defaultMySQLPort

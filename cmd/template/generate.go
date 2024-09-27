@@ -1,3 +1,4 @@
+// ./cmd/template/generate.go
 package template
 
 import (
@@ -38,7 +39,7 @@ func createProjectFromTemplate(templateDir, projectDir string) {
 	})
 
 	if err != nil {
-		fmt.Printf("Error while copying templates: %v\n", err)
+		utils.LogError(fmt.Sprintf("Error while copying templates: %v", err))
 	}
 }
 

@@ -1,4 +1,4 @@
-// cmd/generate/guard/generate.go
+// ./cmd/generate/guard/generate.go
 package guard
 
 import (
@@ -10,7 +10,7 @@ import (
 
 func generateGuardFile(projectDir string) {
 	templatePath := "templates/others/guard.go.tpl"
-	outputPath := filepath.Join(projectDir, fmt.Sprintf("%s.guard.go", guardName))
+	outputPath := filepath.Join(projectDir, fmt.Sprintf("%s.guard.go", utils.ConvertToSnakeCase(guardName)))
 	config := map[string]string{
 		"Module":              utils.DetectModuleName(),
 		"GuardName":           utils.ConvertToSnakeCase(guardName),
