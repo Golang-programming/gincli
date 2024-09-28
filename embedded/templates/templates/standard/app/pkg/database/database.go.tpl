@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	"gorm.io/driver/{{.DBDriver}}"
+	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
@@ -19,7 +19,7 @@ func init() {
 		os.Getenv("DB_PORT"),
 		os.Getenv("DB_NAME"))
 
-	db, err := gorm.Open({{.DBDriver}}.Open(dsn), &gorm.Config{})
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatal("Failed to connect to database:", err)
 	}

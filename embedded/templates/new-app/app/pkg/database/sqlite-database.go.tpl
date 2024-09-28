@@ -3,7 +3,7 @@ package database
 import (
 	"log"
 
-	"gorm.io/glebarez/sqlite"
+	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"
 )
 

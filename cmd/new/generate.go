@@ -1,7 +1,6 @@
 package new
 
 import (
-	"os"
 	"path/filepath"
 	"strings"
 	"time"
@@ -27,7 +26,9 @@ func generateProjectFiles(projectDir string) {
 		"templates/new-app/app/controller/controller.go.tpl": "app/controller/controller.go",
 	}
 
-	if strings.ToLower(dbType) != "sqlite" {
+	if strings.ToLower(dbType) == "mongodb" {
+		templates["templates/new-app/app/pkg/database/mongodb-database.go.tpl"] = "app/pkg/database/database.go"
+	} else if strings.ToLower(dbType) != "sqlite" {
 		templates["templates/new-app/app/pkg/database/database.go.tpl"] = "app/pkg/database/database.go"
 		templates["templates/new-app/docker-compose.yml.tpl"] = "docker-compose.yml"
 	} else {
@@ -52,19 +53,6 @@ func getConfig() map[string]string {
 		"AppName":    appName,
 		"Module":     appName,
 		"DBDriver":   dbDriver,
+		"DBUri":      mongodbUri,
 	}
-}
-
-func setupProjectDirectories() {
-	var directoriesPaths []string = []string{
-		appName + "/app/pkg/database",
-		appName + "/app/service",
-		appName + "/app/utils",
-		appName + "/app/controller",
-	}
-
-	for _, targetPath := range directoriesPaths {
-		os.MkdirAll(targetPath, os.ModePerm)
-	}
-
 }

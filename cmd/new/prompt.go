@@ -12,11 +12,12 @@ import (
 func promptForValues() {
 	promptForAppName()
 	promptForDBType()
-	if dbConnectionString == "" {
-		promptForDBConfig()
-		dbConnectionString = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", dbUsername, dbPassword, dbHost, dbPort, dbName)
+	if strings.ToLower(dbType) == "mongodb" {
 	} else {
-		parseConnectionString(dbConnectionString)
+
+		if strings.ToLower(dbType) != "sqlite" {
+			promptForDBConfig()
+		}
 	}
 }
 
@@ -29,6 +30,18 @@ func promptForAppName() {
 		survey.AskOne(prompt, &appName)
 	}
 }
+
+
+func promptForMongoDBUri() {
+	if appName == "" {
+		prompt := &survey.Input{
+			Message: fmt.Sprintf("Enter your app name [%s]: ", color.New(color.Faint).Sprint(defaultAppName)),
+			Default: defaultAppName,
+		}
+		survey.AskOne(prompt, &appName)
+	}
+}
+
 
 func promptForDBType() {
 	if dbType == "" {
@@ -78,27 +91,5 @@ func promptForDBConfig() {
 			Default: defaultPort,
 		}
 		survey.AskOne(prompt, &dbPort)
-	}
-}
-
-func parseConnectionString(connectionString string) {
-	parts := strings.Split(connectionString, "@")
-	if len(parts) == 2 {
-		dbCredentials := strings.Split(parts[0], ":")
-		if len(dbCredentials) == 2 {
-			dbUsername = dbCredentials[0]
-			dbPassword = dbCredentials[1]
-		}
-		dbHostAndPort := strings.Split(parts[1], "/")
-		hostPort := strings.TrimPrefix(dbHostAndPort[0], "tcp(")
-		hostPort = strings.TrimSuffix(hostPort, ")")
-		hostPortParts := strings.Split(hostPort, ":")
-		if len(hostPortParts) == 2 {
-			dbHost = hostPortParts[0]
-			dbPort = hostPortParts[1]
-		}
-		if len(dbHostAndPort) > 1 {
-			dbName = dbHostAndPort[1]
-		}
 	}
 }

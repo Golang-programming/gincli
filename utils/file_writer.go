@@ -8,14 +8,11 @@ import (
 	"text/template"
 
 	"github.com/AlecAivazis/survey/v2"
-	"github.com/golang-programming/gincli/embedded" // Adjust the import path based on your module
+	"github.com/golang-programming/gincli/embedded"
 )
 
-// GenerateFileFromTemplate generates a file from a template using embedded templates.
 func GenerateFileFromTemplate(templatePath, outputPath string, data map[string]string) {
-	// Check if the file already exists
 	if _, err := os.Stat(outputPath); err == nil {
-		// File exists, prompt for overwrite
 		overwrite := false
 		prompt := &survey.Confirm{
 			Message: fmt.Sprintf("File %s already exists. Do you want to overwrite it?", outputPath),
@@ -28,12 +25,10 @@ func GenerateFileFromTemplate(templatePath, outputPath string, data map[string]s
 		}
 	}
 
-	// Create the directories if they do not exist
 	if err := CreateDirectories(filepath.Dir(outputPath)); err != nil {
 		LogError(fmt.Sprintf("Error creating directories: %s", err))
 	}
 
-	// Read the template from the embedded filesystem
 	tmplBytes, err := embedded.TemplatesFS.ReadFile(templatePath)
 	if err != nil {
 		LogError(fmt.Sprintf("Error reading embedded template (%s): %s", templatePath, err))
