@@ -4,7 +4,7 @@ Certainly! Here's a streamlined version of your `README.md` that includes the **
 
 # Gin CLI
 
-![Gin CLI Logo](https://github.com/golang-programming/gincli/assets/your-logo-path)
+![Gin CLI Logo](https://github.com/golang-programming/gincli/gincli-logo.jpg)
 
 Gin CLI is a powerful command-line tool designed to help you quickly scaffold [Gin Web Framework](https://gin-gonic.com/) applications with a standardized project structure and essential components. Focus on building your application without the hassle of initial setup!
 
@@ -33,11 +33,7 @@ gin --version
 #### For Windows (Using PowerShell):
 
 ```powershell
-# Replace <version> with the actual version, e.g., v1.0.0
-Invoke-WebRequest -Uri "https://github.com/golang-programming/gincli/releases/download/<version>/gin-windows-amd64.exe" -OutFile "gin.exe"
-
-# Move gin.exe to a directory in your PATH or keep it in the current directory
-# Verify the installation
+Invoke-WebRequest -Uri "https://github.com/golang-programming/gincli/releases/download/v1.0.0/gin-windows-amd64.exe" -OutFile "gin.exe"
 .\gin.exe --version
 ```
 
