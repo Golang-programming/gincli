@@ -9,6 +9,7 @@ import (
 )
 
 func generateControllerFile(projectDir string) {
+	// Template path relative to the embedded FS
 	templatePath := "templates/others/controller.go.tpl"
 	outputPath := filepath.Join(projectDir, fmt.Sprintf("%s.controller.go", utils.ConvertToSnakeCase(controllerName)))
 	config := map[string]string{

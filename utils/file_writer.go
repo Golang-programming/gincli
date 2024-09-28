@@ -8,10 +8,10 @@ import (
 	"text/template"
 
 	"github.com/AlecAivazis/survey/v2"
+	"github.com/golang-programming/gincli/embedded" // Adjust the import path based on your module
 )
 
-// GenerateFileFromTemplate generates a file from a template using explicit paths.
-// It prompts the user before overwriting existing files.
+// GenerateFileFromTemplate generates a file from a template using embedded templates.
 func GenerateFileFromTemplate(templatePath, outputPath string, data map[string]string) {
 	// Check if the file already exists
 	if _, err := os.Stat(outputPath); err == nil {
@@ -33,23 +33,29 @@ func GenerateFileFromTemplate(templatePath, outputPath string, data map[string]s
 		LogError(fmt.Sprintf("Error creating directories: %s", err))
 	}
 
-	// Parse the template
-	tmpl, err := template.ParseFiles(templatePath)
+	// Read the template from the embedded filesystem
+	tmplBytes, err := embedded.TemplatesFS.ReadFile(templatePath)
 	if err != nil {
-		LogError(fmt.Sprintf("Error parsing template: %s", err))
+		LogError(fmt.Sprintf("Error reading embedded template (%s): %s", templatePath, err))
+	}
+
+	// Parse the template
+	tmpl, err := template.New(filepath.Base(templatePath)).Parse(string(tmplBytes))
+	if err != nil {
+		LogError(fmt.Sprintf("Error parsing template (%s): %s", templatePath, err))
 	}
 
 	// Create or truncate the output file
 	outputFile, err := os.Create(outputPath)
 	if err != nil {
-		LogError(fmt.Sprintf("Error creating file: %s", err))
+		LogError(fmt.Sprintf("Error creating file (%s): %s", outputPath, err))
 	}
 	defer outputFile.Close()
 
 	// Execute the template with provided data
 	err = tmpl.Execute(outputFile, data)
 	if err != nil {
-		LogError(fmt.Sprintf("Error executing template: %s", err))
+		LogError(fmt.Sprintf("Error executing template (%s): %s", templatePath, err))
 	}
 
 	LogSuccess(fmt.Sprintf("Generated file: %s", outputPath))
