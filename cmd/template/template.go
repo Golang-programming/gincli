@@ -20,7 +20,6 @@ var (
 	dbUsername            string
 	dbPassword            string
 	dbPort                string
-	dbConnectionString    string
 	skipPrompts           bool
 	templateChoice        string
 	defaultAppName        = "my-gin-app"
@@ -30,28 +29,25 @@ var (
 	defaultDBName         = "default"
 	defaultDBHost         = "localhost"
 	defaultMySQLPort      = "3306"
-	defaultPostgresPort   = "5432"
 	defaultTemplateChoice = "Standard"
 	availableTemplates    = []string{"standard"}
-	availableDBTypes      = []string{"MySQL", "PostgreSQL"}
 )
 
 var TemplateCmd = &cobra.Command{
-	Use:   "template",
-	Short: "Load application startup template",
-	Run:   loadTemplate,
+	Use:     "template <name>",
+	Short:   "Load application startup template",
+	Aliases: []string{"t"},
+	Args:    cobra.MinimumNArgs(1),
+	Run:     loadTemplate,
 }
 
 func init() {
 	TemplateCmd.Flags().StringVarP(&templateChoice, "template", "t", "", fmt.Sprintf("Template: Standard (default: %s)", defaultTemplateChoice))
-	TemplateCmd.Flags().StringVarP(&appName, "app-name", "a", "", fmt.Sprintf("Name of your application (default: %s)", defaultAppName))
-	TemplateCmd.Flags().StringVarP(&dbType, "db-type", "d", "", "Database type: MySQL, PostgreSQL")
-	TemplateCmd.Flags().StringVarP(&dbConnectionString, "db-connection-string", "c", "", "Database connection string")
 	TemplateCmd.Flags().StringVarP(&dbHost, "db-host", "H", "", fmt.Sprintf("Database host (default: %s)", defaultDBHost))
 	TemplateCmd.Flags().StringVarP(&dbName, "db-name", "n", "", fmt.Sprintf("Database name (default: %s)", defaultDBName))
 	TemplateCmd.Flags().StringVarP(&dbUsername, "db-username", "u", "", fmt.Sprintf("Database username (default: %s)", defaultDBUsername))
 	TemplateCmd.Flags().StringVarP(&dbPassword, "db-password", "p", "", fmt.Sprintf("Database password (default: %s)", defaultDBPassword))
-	TemplateCmd.Flags().StringVarP(&dbPort, "db-port", "P", "", "Database port (default: 3306 for MySQL, 5432 for PostgreSQL)")
+	TemplateCmd.Flags().StringVarP(&dbPort, "db-port", "P", "", "Database port (default: 3306 for MySQL)")
 	TemplateCmd.Flags().BoolVarP(&skipPrompts, "yes", "y", false, "Skip all prompts and use default values")
 }
 
@@ -73,13 +69,11 @@ func CustomTemplateHelpFunc(cmd *cobra.Command, args []string) {
 	}{
 		{"template", "t", "Template to use (Standard)", defaultTemplateChoice},
 		{"app-name", "a", "Name of your application", defaultAppName},
-		{"db-type", "d", "Database type (MySQL, PostgreSQL)", defaultDBType},
-		{"db-connection-string", "c", "Database connection string", ""},
 		{"db-host", "H", "Database host", defaultDBHost},
 		{"db-name", "n", "Database name", defaultDBName},
 		{"db-username", "u", "Database username", defaultDBUsername},
 		{"db-password", "p", "Database password", defaultDBPassword},
-		{"db-port", "P", "Database port", "3306 or 5432"},
+		{"db-port", "P", "Database port", "3306"},
 		{"yes", "y", "Skip prompts and use default values", "false"},
 	}
 
@@ -93,6 +87,8 @@ func CustomTemplateHelpFunc(cmd *cobra.Command, args []string) {
 }
 
 func loadTemplate(cmd *cobra.Command, args []string) {
+	appName = args[0]
+
 	if skipPrompts {
 		setDefaultValues()
 	} else {
@@ -116,9 +112,6 @@ func setDefaultValues() {
 	if templateChoice == "" {
 		templateChoice = defaultTemplateChoice
 	}
-	if appName == "" {
-		appName = defaultAppName
-	}
 	if dbType == "" {
 		dbType = defaultDBType
 	}
@@ -135,13 +128,6 @@ func setDefaultValues() {
 		dbPassword = defaultDBPassword
 	}
 	if dbPort == "" {
-		if strings.ToLower(dbType) == "postgresql" {
-			dbPort = defaultPostgresPort
-		} else {
-			dbPort = defaultMySQLPort
-		}
-	}
-	if dbConnectionString == "" {
-		dbConnectionString = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", dbUsername, dbPassword, dbHost, dbPort, dbName)
+		dbPort = defaultMySQLPort
 	}
 }

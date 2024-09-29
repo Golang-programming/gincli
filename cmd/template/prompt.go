@@ -3,7 +3,6 @@ package template
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/fatih/color"
@@ -12,13 +11,7 @@ import (
 func promptForValues() {
 	promptForAppName()
 	promptForTemplate()
-	promptForDBType()
-	if dbConnectionString == "" {
-		promptForDBConfig()
-		dbConnectionString = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", dbUsername, dbPassword, dbHost, dbPort, dbName)
-	} else {
-		parseConnectionString(dbConnectionString)
-	}
+	promptForDBConfig()
 }
 
 func promptForTemplate() {
@@ -38,16 +31,6 @@ func promptForAppName() {
 			Default: defaultAppName,
 		}
 		survey.AskOne(prompt, &appName)
-	}
-}
-
-func promptForDBType() {
-	if dbType == "" {
-		prompt := &survey.Select{
-			Message: fmt.Sprintf("Select your database: [%s]", color.New(color.Faint).Sprint(defaultDBType)),
-			Options: availableDBTypes,
-		}
-		survey.AskOne(prompt, &dbType)
 	}
 }
 
@@ -80,36 +63,10 @@ func promptForDBConfig() {
 		survey.AskOne(prompt, &dbHost)
 	}
 	if dbPort == "" {
-		defaultPort := defaultMySQLPort
-		if strings.ToLower(dbType) == "postgresql" {
-			defaultPort = defaultPostgresPort
-		}
 		prompt := &survey.Input{
-			Message: fmt.Sprintf("Enter DB port [%s]: ", color.New(color.Faint).Sprint(defaultPort)),
-			Default: defaultPort,
+			Message: fmt.Sprintf("Enter DB port [%s]: ", color.New(color.Faint).Sprint(defaultMySQLPort)),
+			Default: defaultMySQLPort,
 		}
 		survey.AskOne(prompt, &dbPort)
-	}
-}
-
-func parseConnectionString(connectionString string) {
-	parts := strings.Split(connectionString, "@")
-	if len(parts) == 2 {
-		dbCredentials := strings.Split(parts[0], ":")
-		if len(dbCredentials) == 2 {
-			dbUsername = dbCredentials[0]
-			dbPassword = dbCredentials[1]
-		}
-		dbHostAndPort := strings.Split(parts[1], "/")
-		hostPort := strings.TrimPrefix(dbHostAndPort[0], "tcp(")
-		hostPort = strings.TrimSuffix(hostPort, ")")
-		hostPortParts := strings.Split(hostPort, ":")
-		if len(hostPortParts) == 2 {
-			dbHost = hostPortParts[0]
-			dbPort = hostPortParts[1]
-		}
-		if len(dbHostAndPort) > 1 {
-			dbName = dbHostAndPort[1]
-		}
 	}
 }

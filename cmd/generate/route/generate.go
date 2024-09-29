@@ -9,7 +9,7 @@ import (
 )
 
 func generateRouteFile(projectDir string) {
-	templatePath := "templates/others/route.go.tpl"
+	templatePath := "templates/others/routes.go.tpl"
 	outputPath := filepath.Join(projectDir, fmt.Sprintf("%s.route.go", utils.ConvertToSnakeCase(routeName)))
 	config := map[string]string{
 		"Module":              utils.DetectModuleName(),

@@ -13,6 +13,7 @@ import (
 )
 
 func createProjectFromTemplate(templateDir, projectDir string) {
+	// Initialize and start the spinner
 	s := spinner.New(spinner.CharSets[9], 100*time.Millisecond)
 	s.Suffix = " Creating project structure..."
 	s.Start()
@@ -51,7 +52,6 @@ func getConfig() map[string]string {
 		"DBHost":     dbHost,
 		"DBPort":     dbPort,
 		"Module":     appName,
-		"Template":   strings.ToLower(templateChoice),
 		"DBDriver":   strings.ToLower(dbType),
 	}
 }

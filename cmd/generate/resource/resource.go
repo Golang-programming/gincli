@@ -23,7 +23,7 @@ var (
 var ResourceCmd = &cobra.Command{
 	Use:     "resource <name> [path]",
 	Short:   "Create a resource with pre-defined components",
-	Aliases: []string{"r"},
+	Aliases: []string{"res"},
 	Args:    cobra.MinimumNArgs(1),
 	Run:     createResource,
 }

@@ -10,38 +10,22 @@ import (
 )
 
 func promptForValues() {
-	promptForAppName()
 	promptForDBType()
 	if strings.ToLower(dbType) == "mongodb" {
+		promptForMongoDBUri()
 	} else {
-
 		if strings.ToLower(dbType) != "sqlite" {
 			promptForDBConfig()
 		}
 	}
 }
 
-func promptForAppName() {
-	if appName == "" {
-		prompt := &survey.Input{
-			Message: fmt.Sprintf("Enter your app name [%s]: ", color.New(color.Faint).Sprint(defaultAppName)),
-			Default: defaultAppName,
-		}
-		survey.AskOne(prompt, &appName)
-	}
-}
-
-
 func promptForMongoDBUri() {
-	if appName == "" {
-		prompt := &survey.Input{
-			Message: fmt.Sprintf("Enter your app name [%s]: ", color.New(color.Faint).Sprint(defaultAppName)),
-			Default: defaultAppName,
-		}
-		survey.AskOne(prompt, &appName)
+	prompt := &survey.Input{
+		Message: "MongoDB URI: ",
 	}
+	survey.AskOne(prompt, &mongodbUri)
 }
-
 
 func promptForDBType() {
 	if dbType == "" {
@@ -83,7 +67,7 @@ func promptForDBConfig() {
 	}
 	if dbPort == "" {
 		defaultPort := defaultMySQLPort
-		if strings.ToLower(dbType) == "postgresql" {
+		if strings.ToLower(dbType) == "postgres" {
 			defaultPort = defaultPostgresPort
 		}
 		prompt := &survey.Input{

@@ -13,10 +13,10 @@ import (
 )
 
 func generateResourceFromTemplate() {
-	templatePath := fmt.Sprintf("templates/others/resource/%s", strings.ToLower(transport))
+	templatePath := fmt.Sprintf("templates/others/%s/endpoints", strings.ToLower(transport))
 	resource := resourcePath + "/" + resourceName
 	if !createEndpoint {
-		templatePath = fmt.Sprintf("templates/others/resource/%s/blank", strings.ToLower(transport))
+		templatePath = fmt.Sprintf("templates/others/%s/blank", strings.ToLower(transport))
 	}
 
 	s := spinner.New(spinner.CharSets[9], 100*time.Millisecond)
@@ -34,6 +34,7 @@ func generateResourceFromTemplate() {
 
 		if strings.HasSuffix(info.Name(), ".tpl") {
 			targetFile := strings.TrimSuffix(targetPath, ".tpl")
+			fmt.Print(path, targetFile)
 			utils.GenerateFileFromTemplate(path, targetFile, getConfig())
 		}
 
