@@ -14,7 +14,7 @@ func generateRouteFile(projectDir string) {
 	config := map[string]string{
 		"Module":              utils.DetectModuleName(),
 		"RouteName":           utils.ConvertToSnakeCase(routeName),
-		"CapitalizeRouteName": utils.Capitalize(routeName),
+		"CapitalizeRouteName": utils.ToPascalCase(routeName),
 	}
 	utils.GenerateFileFromTemplate(templatePath, outputPath, config)
 }

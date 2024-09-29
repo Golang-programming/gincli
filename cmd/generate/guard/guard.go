@@ -26,7 +26,7 @@ func init() {
 }
 
 func createGuard(cmd *cobra.Command, args []string) {
-	guardName = args[0]
+	guardName = utils.ConvertToSnakeCase(args[0])
 	defaultPath := filepath.Join(".", "app", "guards", guardName)
 
 	if len(args) > 1 {

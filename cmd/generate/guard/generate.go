@@ -14,7 +14,7 @@ func generateGuardFile(projectDir string) {
 	config := map[string]string{
 		"Module":              utils.DetectModuleName(),
 		"GuardName":           utils.ConvertToSnakeCase(guardName),
-		"CapitalizeGuardName": utils.Capitalize(guardName),
+		"CapitalizeGuardName": utils.ToPascalCase(guardName),
 	}
 	utils.GenerateFileFromTemplate(templatePath, outputPath, config)
 }

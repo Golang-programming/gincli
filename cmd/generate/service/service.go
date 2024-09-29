@@ -27,7 +27,7 @@ func init() {
 }
 
 func createService(cmd *cobra.Command, args []string) {
-	serviceName = args[0]
+	serviceName = utils.ConvertToSnakeCase(args[0])
 	defaultProjectDir := filepath.Join(".", "app", "modules", serviceName, "services")
 
 	// Check if a custom path is provided as the second argument

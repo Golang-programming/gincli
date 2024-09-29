@@ -27,7 +27,7 @@ func init() {
 }
 
 func createController(cmd *cobra.Command, args []string) {
-	controllerName = args[0]
+	controllerName = utils.ConvertToSnakeCase(args[0])
 	defaultProjectDir := filepath.Join(".", "app", "modules", controllerName, "controllers")
 
 	// Check if a custom path is provided as the second argument

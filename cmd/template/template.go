@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/golang-programming/gincli/utils"
 	"github.com/olekukonko/tablewriter"
@@ -85,7 +84,7 @@ func CustomTemplateHelpFunc(cmd *cobra.Command, args []string) {
 }
 
 func loadTemplate(cmd *cobra.Command, args []string) {
-	appName = args[0]
+	appName = utils.ConvertToSnakeCase(args[0])
 
 	if skipPrompts {
 		setDefaultValues()
@@ -94,7 +93,7 @@ func loadTemplate(cmd *cobra.Command, args []string) {
 	}
 
 	projectDir := filepath.Join(".", appName)
-	createProjectFromTemplate(fmt.Sprintf("templates/templates/%s", strings.ToLower(templateChoice)), projectDir)
+	createProjectFromTemplate(projectDir)
 
 	utils.InitializeGoModule(projectDir, appName)
 

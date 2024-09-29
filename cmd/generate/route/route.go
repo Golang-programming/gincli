@@ -27,7 +27,7 @@ func init() {
 }
 
 func createRoute(cmd *cobra.Command, args []string) {
-	routeName = args[0]
+	routeName = utils.ConvertToSnakeCase(args[0])
 	defaultProjectDir := filepath.Join(".", "app", "modules", routeName)
 
 	// Check if a custom path is provided as the second argument

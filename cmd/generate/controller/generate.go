@@ -15,7 +15,7 @@ func generateControllerFile(projectDir string) {
 	config := map[string]string{
 		"Module":                   utils.DetectModuleName(),
 		"ControllerName":           utils.ConvertToSnakeCase(controllerName),
-		"CapitalizeControllerName": utils.Capitalize(controllerName),
+		"CapitalizeControllerName": utils.ToPascalCase(controllerName),
 	}
 	utils.GenerateFileFromTemplate(templatePath, outputPath, config)
 }

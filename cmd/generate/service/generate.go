@@ -14,7 +14,7 @@ func generateServiceFile(projectDir string) {
 	config := map[string]string{
 		"Module":                utils.DetectModuleName(),
 		"ServiceName":           utils.ConvertToSnakeCase(serviceName),
-		"CapitalizeServiceName": utils.Capitalize(serviceName),
+		"CapitalizeServiceName": utils.ToPascalCase(serviceName),
 	}
 	utils.GenerateFileFromTemplate(templatePath, outputPath, config)
 }

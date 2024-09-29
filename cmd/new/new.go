@@ -49,7 +49,7 @@ func init() {
 }
 
 func createNewApp(cmd *cobra.Command, args []string) {
-	appName = args[0]
+	appName = utils.ConvertToSnakeCase(args[0])
 
 	if skipPrompts {
 		setDefaultValues()

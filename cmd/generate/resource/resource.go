@@ -33,7 +33,7 @@ func init() {
 }
 
 func createResource(cmd *cobra.Command, args []string) {
-	resourceName = args[0]
+	resourceName = utils.ConvertToSnakeCase(args[0])
 
 	defaultPath := filepath.Join(".", "app", "modules", resourceName)
 
