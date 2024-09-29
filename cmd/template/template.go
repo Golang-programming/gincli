@@ -22,7 +22,6 @@ var (
 	dbPort                string
 	skipPrompts           bool
 	templateChoice        string
-	defaultAppName        = "my-gin-app"
 	defaultDBUsername     = "root"
 	defaultDBType         = "MySQL"
 	defaultDBPassword     = "password"
@@ -68,7 +67,6 @@ func CustomTemplateHelpFunc(cmd *cobra.Command, args []string) {
 		Default     string
 	}{
 		{"template", "t", "Template to use (Standard)", defaultTemplateChoice},
-		{"app-name", "a", "Name of your application", defaultAppName},
 		{"db-host", "H", "Database host", defaultDBHost},
 		{"db-name", "n", "Database name", defaultDBName},
 		{"db-username", "u", "Database username", defaultDBUsername},

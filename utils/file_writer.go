@@ -1,4 +1,3 @@
-// ./utils/file_writer.go
 package utils
 
 import (

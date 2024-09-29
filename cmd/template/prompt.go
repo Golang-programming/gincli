@@ -9,7 +9,6 @@ import (
 )
 
 func promptForValues() {
-	promptForAppName()
 	promptForTemplate()
 	promptForDBConfig()
 }
@@ -21,16 +20,6 @@ func promptForTemplate() {
 			Options: availableTemplates,
 		}
 		survey.AskOne(prompt, &templateChoice)
-	}
-}
-
-func promptForAppName() {
-	if appName == "" {
-		prompt := &survey.Input{
-			Message: fmt.Sprintf("Enter your app name [%s]: ", color.New(color.Faint).Sprint(defaultAppName)),
-			Default: defaultAppName,
-		}
-		survey.AskOne(prompt, &appName)
 	}
 }
 
