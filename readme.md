@@ -1,7 +1,3 @@
-Certainly! Here's a streamlined version of your `README.md` that includes the **name**, **logo**, **installation instructions via `curl` and `git clone`**, **support email**, and a **table outlining commands and subcommands**.
-
----
-
 # Gin CLI
 
 ![ChatGPT Image Apr 21, 2025, 10_46_47 AM (1)](https://github.com/user-attachments/assets/1e900282-b870-4378-a7ae-6ff7d593529f)
@@ -110,7 +106,5 @@ After generating your application:
 For issues or suggestions, please contact us at:
 
 📧 [zeshanshakil0@gmail.com](mailto:zeshanshakil0@gmail.com)
-
----
 
 **Happy Coding!** 🚀
