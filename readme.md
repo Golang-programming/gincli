@@ -4,7 +4,7 @@ Certainly! Here's a streamlined version of your `README.md` that includes the **
 
 # Gin CLI
 
-![Gin CLI Logo](https://github.com/golang-programming/gincli/gincli-logo.jpg)
+![ChatGPT Image Apr 21, 2025, 10_46_47 AM](https://github.com/user-attachments/assets/d700a8ab-e015-46dc-83ee-71c192146850)
 
 Gin CLI is a powerful command-line tool designed to help you quickly scaffold [Gin Web Framework](https://gin-gonic.com/) applications with a standardized project structure and essential components. Focus on building your application without the hassle of initial setup!
 
